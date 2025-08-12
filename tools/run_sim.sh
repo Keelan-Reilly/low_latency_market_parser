@@ -15,6 +15,7 @@ set -x
 
 # Build with auto-main (no main.cpp)
 verilator --cc --exe --build \
+    --trace \
     --timing \
     --error-limit 0 \
     --Wno-TIMESCALEMOD \

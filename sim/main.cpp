@@ -53,15 +53,23 @@ int main(int argc, char** argv) {
                        << " 0x" << std::hex << std::setw(8) << std::setfill('0')
                        << top->tx_word_data << std::dec << "\n";
         }
-        prev_tx_word_valid = cur;
     };
 
     auto log_parser = [&]() {
         if (top->parsed_valid_reg) {
-            parser_out << "PARSED @" << top->t_parser
+            parser_out << "PARSED @" << top->t_parser_event
                        << " type="   << char(top->parsed_type_reg)
                        << " price="  << std::dec << top->parsed_price_reg
                        << " volume=" << top->parsed_volume_reg << "\n";
+        }
+    };
+
+    auto log_decision = [&]() {
+        bool cur = top->tx_word_valid;
+        if (cur && !prev_tx_word_valid) {
+            decision_out << "DECISION @" << top->t_decision
+                        << " data=0x" << std::hex << std::setw(8) << std::setfill('0')
+                        << top->tx_word_data << std::dec << "\n";
         }
     };
 
@@ -103,7 +111,6 @@ int main(int argc, char** argv) {
             lat_out << ingress << "," << parser_t << "," << logic_t << "," << decision << ","
                     << parser_lat << "," << logic_lat << "," << total_lat << "\n";
         }
-        prev_tx_word_valid = cur;
     };
 
     auto log_payload = [&]() {
@@ -114,18 +121,19 @@ int main(int argc, char** argv) {
     };
 
     auto tick_one_cycle = [&](){
-    top->clk = 0; top->eval();
-    top->clk = 1; top->eval();
+        top->clk = 0; top->eval();
+        top->clk = 1; top->eval();
 
-    // capture exactly once per full clock
-    uart_out << int(top->uart_tx) << "\n";
+        // capture exactly once per full clock
+        uart_out << int(top->uart_tx) << "\n";
 
-    // log events once per cycle (prevents duplicates)
-    log_payload();
-    log_parser();
-    log_crc();
-    log_latency_on_tx_accept();
-    log_txword_edge();
+        // log events once per cycle (prevents duplicates)
+        log_payload();
+        log_parser();
+        log_crc();
+        log_latency_on_tx_accept();
+        log_txword_edge();
+        log_decision();
     };
 
     // -------- Feed bytes (one full cycle per byte) --------

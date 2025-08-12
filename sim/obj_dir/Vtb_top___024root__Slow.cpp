@@ -17,7 +17,7 @@ Vtb_top___024root::Vtb_top___024root(Vtb_top__Syms* symsp, const char* v__name)
 }
 
 void Vtb_top___024root::__Vconfigure(bool first) {
-    (void)first;  // Prevent unused variable warning
+    if (false && first) {}  // Prevent unused
 }
 
 Vtb_top___024root::~Vtb_top___024root() {

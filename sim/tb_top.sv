@@ -22,6 +22,7 @@ module tb_top (
   // Timestamp outputs
   output logic [31:0] t_ingress,
   output logic [31:0] t_parser,   // New
+  output logic [31:0] t_parser_event, // New
   output logic [31:0] t_logic,    // New
   output logic [31:0] t_decision,
   output logic [31:0] cycle_cnt,
@@ -129,10 +130,12 @@ module tb_top (
 
     // Timestamp tagging
     .cycle_cnt       (cycle_cnt),
-    .t_ingress       (t_ingress_unused),
+    .t_ingress       (t_ingress),
     .t_parser        (t_parser),
+    .t_parser_event  (t_parser_event), // New
     .t_logic         (t_logic),
-    .t_decision      (t_decision)
+    .t_decision      (t_decision),
+    .msg_start       (parser_msg_start)
   );
 
   assign parsed_valid_reg  = p2l_out_valid;
@@ -179,14 +182,6 @@ module tb_top (
     .volume    (volume),
     .msg_start (parser_msg_start)  
   );
-
-  // Timestamp the ingress of each ITCH message
-  always_ff @(posedge clk or negedge rst_n) begin
-    if (!rst_n)
-      t_ingress <= 32'd0;
-    else if (parser_msg_start)
-      t_ingress <= cycle_cnt;
-  end
 
   // Trading logic gets its inputs from the second pipeline stage
   trading_logic u_tl (

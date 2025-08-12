@@ -2,6 +2,7 @@
 // DESCRIPTION: Verilator output: Model implementation (design independent parts)
 
 #include "Vtb_top__pch.h"
+#include "verilated_vcd_c.h"
 
 //============================================================
 // Constructors
@@ -31,6 +32,7 @@ Vtb_top::Vtb_top(VerilatedContext* _vcontextp__, const char* _vcname__)
     , volume{vlSymsp->TOP.volume}
     , t_ingress{vlSymsp->TOP.t_ingress}
     , t_parser{vlSymsp->TOP.t_parser}
+    , t_parser_event{vlSymsp->TOP.t_parser_event}
     , t_logic{vlSymsp->TOP.t_logic}
     , t_decision{vlSymsp->TOP.t_decision}
     , cycle_cnt{vlSymsp->TOP.cycle_cnt}
@@ -75,6 +77,7 @@ void Vtb_top::eval_step() {
     // Debug assertions
     Vtb_top___024root___eval_debug_assertions(&(vlSymsp->TOP));
 #endif  // VL_DEBUG
+    vlSymsp->__Vm_activity = true;
     vlSymsp->__Vm_deleter.deleteAll();
     if (VL_UNLIKELY(!vlSymsp->__Vm_didInit)) {
         vlSymsp->__Vm_didInit = true;
@@ -94,7 +97,7 @@ void Vtb_top::eval_step() {
 bool Vtb_top::eventsPending() { return false; }
 
 uint64_t Vtb_top::nextTimeSlot() {
-    VL_FATAL_MT(__FILE__, __LINE__, "", "No delays in the design");
+    VL_FATAL_MT(__FILE__, __LINE__, "", "%Error: No delays in the design");
     return 0;
 }
 
@@ -123,4 +126,41 @@ unsigned Vtb_top::threads() const { return 1; }
 void Vtb_top::prepareClone() const { contextp()->prepareClone(); }
 void Vtb_top::atClone() const {
     contextp()->threadPoolpOnClone();
+}
+std::unique_ptr<VerilatedTraceConfig> Vtb_top::traceConfig() const {
+    return std::unique_ptr<VerilatedTraceConfig>{new VerilatedTraceConfig{false, false, false}};
+};
+
+//============================================================
+// Trace configuration
+
+void Vtb_top___024root__trace_decl_types(VerilatedVcd* tracep);
+
+void Vtb_top___024root__trace_init_top(Vtb_top___024root* vlSelf, VerilatedVcd* tracep);
+
+VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32_t code) {
+    // Callback from tracep->open()
+    Vtb_top___024root* const __restrict vlSelf VL_ATTR_UNUSED = static_cast<Vtb_top___024root*>(voidSelf);
+    Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    if (!vlSymsp->_vm_contextp__->calcUnusedSigs()) {
+        VL_FATAL_MT(__FILE__, __LINE__, __FILE__,
+            "Turning on wave traces requires Verilated::traceEverOn(true) call before time 0.");
+    }
+    vlSymsp->__Vm_baseCode = code;
+    tracep->pushPrefix(std::string{vlSymsp->name()}, VerilatedTracePrefixType::SCOPE_MODULE);
+    Vtb_top___024root__trace_decl_types(tracep);
+    Vtb_top___024root__trace_init_top(vlSelf, tracep);
+    tracep->popPrefix();
+}
+
+VL_ATTR_COLD void Vtb_top___024root__trace_register(Vtb_top___024root* vlSelf, VerilatedVcd* tracep);
+
+VL_ATTR_COLD void Vtb_top::trace(VerilatedVcdC* tfp, int levels, int options) {
+    if (tfp->isOpen()) {
+        vl_fatal(__FILE__, __LINE__, __FILE__,"'Vtb_top::trace()' shall not be called after 'VerilatedVcdC::open()'.");
+    }
+    if (false && levels && options) {}  // Prevent unused
+    tfp->spTrace()->addModel(this);
+    tfp->spTrace()->addInitCb(&trace_init, &(vlSymsp->TOP));
+    Vtb_top___024root__trace_register(&(vlSymsp->TOP), tfp->spTrace());
 }

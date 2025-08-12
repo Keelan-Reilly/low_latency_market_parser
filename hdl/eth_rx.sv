@@ -212,15 +212,22 @@ module eth_rx (
                         2: begin crc_recv_shift[23:16] <= rx_byte; crc_cnt <= 3; end
                         3: begin
                             
-                            fcs_word = {rx_byte, crc_recv_shift[23:0]};  // [31:24]=last byte seen
-                            dbg_crc_calc    <= (crc_reg ^ 32'hFFFF_FFFF);
-                            dbg_crc_recv    <= fcs_word;
-                            crc_ok    <= ((crc_reg ^ 32'hFFFF_FFFF) == fcs_word);
-                            crc_valid <= 1'b1;
+                            // assemble FCS using current rx_byte + prior bytes
+                            logic [31:0] new_fcs;
+                            new_fcs = {rx_byte, crc_recv_shift[23:0]}; // [31:24]=last byte on wire
 
-                            crc_started <= 1'b0; // CRC finished
-                            state     <= IDLE;
-                            crc_cnt   <= 0;
+                            // keep a registered copy if you want it later
+                            fcs_word     <= new_fcs;   // << non-blocking only
+
+                            // compare/log against the *current* word
+                            dbg_crc_calc <= (crc_reg ^ 32'hFFFF_FFFF);
+                            dbg_crc_recv <= new_fcs;
+                            crc_ok       <= ((crc_reg ^ 32'hFFFF_FFFF) == new_fcs);
+                            crc_valid    <= 1'b1;
+
+                            crc_started  <= 1'b0; // CRC finished
+                            state        <= IDLE;
+                            crc_cnt      <= 0;
                             end
                         endcase
                     end

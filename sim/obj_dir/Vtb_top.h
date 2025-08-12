@@ -12,6 +12,7 @@
 
 class Vtb_top__Syms;
 class Vtb_top___024root;
+class VerilatedVcdC;
 
 // This class is the main interface to the Verilated model
 class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel {
@@ -20,10 +21,6 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     Vtb_top__Syms* const vlSymsp;
 
   public:
-
-    // CONSTEXPR CAPABILITIES
-    // Verilated with --trace?
-    static constexpr bool traceCapable = false;
 
     // PORTS
     // The application code writes and reads these signals to
@@ -50,6 +47,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     VL_OUT(&volume,31,0);
     VL_OUT(&t_ingress,31,0);
     VL_OUT(&t_parser,31,0);
+    VL_OUT(&t_parser_event,31,0);
     VL_OUT(&t_logic,31,0);
     VL_OUT(&t_decision,31,0);
     VL_OUT(&cycle_cnt,31,0);
@@ -96,7 +94,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     /// Returns time at next time slot. Aborts if !eventsPending()
     uint64_t nextTimeSlot();
     /// Trace signals in the model; called by application code
-    void trace(VerilatedTraceBaseC* tfp, int levels, int options = 0) { contextp()->trace(tfp, levels, options); }
+    void trace(VerilatedVcdC* tfp, int levels, int options = 0);
     /// Retrieve name of this model instance (as passed to constructor).
     const char* name() const;
 
@@ -110,9 +108,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     /// Re-init after cloning the model at the process level (e.g. fork in Linux)
     /// Re-allocate necessary resources. Called after cloning.
     void atClone() const;
-  private:
-    // Internal functions - trace registration
-    void traceBaseModel(VerilatedTraceBaseC* tfp, int levels, int options);
+    std::unique_ptr<VerilatedTraceConfig> traceConfig() const override final;
 };
 
 #endif  // guard
