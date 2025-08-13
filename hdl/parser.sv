@@ -68,7 +68,7 @@ module parser (
 
     // Header assembly / bookkeeping
     logic [15:0] length;          // Full 16-bit message length = {len_hi, len_lo}
-    logic [7:0]  len_hi,          // First length byte read from header (MSB of message length)
+    logic [7:0]  len_hi;          // First length byte read from header (MSB of message length)
     logic [7:0]  len_lo;          // Second length byte read from header (LSB of message length)
     logic [7:0]  type_reg;        // captured message type
 
