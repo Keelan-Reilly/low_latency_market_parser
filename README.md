@@ -157,9 +157,7 @@ When backpressure is active, you’ll see PARSED events continue (parser output 
 
 ---
 
-## Configuration knobs
-
-Where to adjust things in the repo:
+## Configuration
 
 - **ETH MAC filter** — `hdl/eth_rx.sv`: `OUR_MAC` constant
 - **Trading rule** — `hdl/trading_logic.sv`: `THRESHOLD` parameter
@@ -169,7 +167,7 @@ Where to adjust things in the repo:
 
 ---
 
-## Repository layout (current)
+## Repository layout 
 
 ```python
 .
@@ -229,3 +227,4 @@ FCS is stored LSB-first (wire order). The receiver computes CRC with the reflect
 - **CRC fails** — Make sure `packets.bin` wasn’t edited; the generator recomputes FCS per frame.
 
 - **No TX words for some PARSED lines** — Your rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
+
