@@ -71,8 +71,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in", dest="infile", default="messages/packets.bin")
     ap.add_argument("--threshold", type=int, default=2_000_000)  # match RTL default
-    ap.add_argument("--out-parsed", default="reference_parsed.csv")
-    ap.add_argument("--out-decisions", default="reference_decisions.csv")
+    ap.add_argument("--out-parsed", default="sim/reference_parsed.csv")
+    ap.add_argument("--out-decisions", default="sim/reference_decisions.csv")
     args = ap.parse_args()
 
     try:
