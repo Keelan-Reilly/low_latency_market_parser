@@ -1,6 +1,6 @@
 # Ultra-Low-Latency FPGA Trading Interface
 
-A tiny, end-to-end market-data pipeline you can simulate on a laptop:
+A tiny, end-to-end market-data pipeline:
 
 - Ethernet byte stream → ITCH parser → simple trading rule → UART transmit
 - Deterministic ready/valid handshakes with lossless backpressure
@@ -50,7 +50,7 @@ A tiny, end-to-end market-data pipeline you can simulate on a laptop:
 ```bash
 # From repo root
 python tools/build_itch_from_gzpart.py --source itch_sample.gz.part
-# Optional knobs:
+# Optional:
 #   --limit N     # cap number of ITCH messages (helps avoid multi-GB outputs)
 #   --skip K      # skip K ITCH messages first (e.g., to reach first 'P' trade)
 # Examples:
@@ -62,7 +62,7 @@ This creates:
 - `messages/packets.bin` — byte-accurate Ethernet frames (with preamble and FCS)
 - `messages/sample.mem` — the same frames, one byte per line in hex
 
-> **Tip:** Real ITCH is huge. Use `--limit` to keep sample.mem reasonable.
+> Real ITCH is huge. Use `--limit` to keep sample.mem reasonable.
 
 ## 2) Build and run the Verilator simulation
 
@@ -93,7 +93,7 @@ python bench/reference_parser.py
 python bench/compare_outputs.py
 ```
 
-You’ll get `reference_parsed.csv` and (if the rule triggers) `reference_decisions.csv`, plus a pass/fail report from the comparator.
+You will get `reference_parsed.csv` and (if the rule triggers) `reference_decisions.csv`, plus a pass/fail report from the comparator.
 
 ---
 
@@ -102,7 +102,6 @@ You’ll get `reference_parsed.csv` and (if the rule triggers) `reference_decisi
 - Verilator (build and run sim)
 - Python 3.9+
 - No network needed for .gz.part path.
-- If you use the optional PCAP route, you’ll want scapy and requests.
 
 Install examples (Ubuntu):
 
@@ -228,4 +227,5 @@ FCS is stored LSB-first (wire order). The receiver computes CRC with the reflect
 - **sample.mem is huge** — Add `--limit` when you build from a real ITCH dump.
 - **No ‘P’ trades near the start** — Use `--skip` to jump ahead (e.g., `--skip 240000`).
 - **CRC fails** — Make sure `packets.bin` wasn’t edited; the generator recomputes FCS per frame.
+
 - **No TX words for some PARSED lines** — Your rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
