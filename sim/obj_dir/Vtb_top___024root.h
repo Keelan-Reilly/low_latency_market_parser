@@ -20,6 +20,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         VL_IN8(rst_n,0,0);
         VL_IN8(rx_byte,7,0);
         VL_IN8(rx_valid,0,0);
+        VL_IN8(sink_allow,0,0);
         VL_OUT8(uart_tx,0,0);
         VL_OUT8(payload_valid,0,0);
         VL_OUT8(payload_byte,7,0);
@@ -31,11 +32,14 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         VL_OUT8(parsed_valid_reg,0,0);
         VL_OUT8(parsed_type_reg,7,0);
         VL_OUT8(tx_word_valid,0,0);
+        VL_OUT8(l2t_stall,0,0);
         CData/*0:0*/ tb_top__DOT__parser_ready;
+        CData/*0:0*/ tb_top__DOT__uart_ready_masked;
+        CData/*0:0*/ tb_top__DOT__dummy_p2l_ready;
+        CData/*0:0*/ tb_top__DOT__unused_parser_ready;
         CData/*7:0*/ tb_top__DOT__decision_type;
         CData/*0:0*/ tb_top__DOT__parser_msg_start;
         CData/*0:0*/ tb_top__DOT__rx2p_out_ready;
-        CData/*0:0*/ tb_top__DOT__p2l_ready;
         CData/*7:0*/ tb_top__DOT__u_prg__DOT__rx2p_data;
         CData/*0:0*/ tb_top__DOT__u_prg__DOT__rx2p_data_valid;
         CData/*7:0*/ tb_top__DOT__u_prg__DOT__p2l_type_reg;
@@ -58,6 +62,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         CData/*7:0*/ tb_top__DOT__u_ut__DOT__sh;
         CData/*0:0*/ tb_top__DOT__u_ut__DOT__accept;
         CData/*0:0*/ __VstlFirstIteration;
+        CData/*0:0*/ __VicoFirstIteration;
         CData/*0:0*/ __Vtrigprevexpr___TOP__clk__0;
         CData/*0:0*/ __Vtrigprevexpr___TOP__rst_n__0;
         CData/*0:0*/ __VactContinue;
@@ -75,18 +80,19 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         VL_OUT(price,31,0);
         VL_OUT(volume,31,0);
         VL_OUT(t_ingress,31,0);
+    };
+    struct {
         VL_OUT(t_parser,31,0);
         VL_OUT(t_parser_event,31,0);
         VL_OUT(t_logic,31,0);
         VL_OUT(t_decision,31,0);
         VL_OUT(cycle_cnt,31,0);
-    };
-    struct {
         VL_OUT(dbg_crc_calc,31,0);
         VL_OUT(dbg_crc_recv,31,0);
         VL_OUT(parsed_price_reg,31,0);
         VL_OUT(parsed_volume_reg,31,0);
         VL_OUT(tx_word_data,31,0);
+        VL_OUT(l2t_stall_cycles,31,0);
         IData/*31:0*/ tb_top__DOT__t_ingress_unused;
         IData/*31:0*/ tb_top__DOT__decision_data;
         IData/*31:0*/ tb_top__DOT__u_prg__DOT__p2l_price_reg;
@@ -115,6 +121,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
     };
     VlTriggerVec<1> __VstlTriggered;
+    VlTriggerVec<1> __VicoTriggered;
     VlTriggerVec<1> __VactTriggered;
     VlTriggerVec<1> __VnbaTriggered;
 

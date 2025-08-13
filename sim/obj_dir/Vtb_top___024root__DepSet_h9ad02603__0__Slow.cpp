@@ -88,10 +88,15 @@ VL_ATTR_COLD void Vtb_top___024root___stl_sequent__TOP__0(Vtb_top___024root* vlS
     vlSelf->parsed_price_reg = vlSelf->tb_top__DOT__u_prg__DOT__p2l_price_reg;
     vlSelf->parsed_volume_reg = vlSelf->tb_top__DOT__u_prg__DOT__p2l_volume_reg;
     vlSelf->tx_word_data = vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_reg;
-    vlSelf->tx_word_valid = ((IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid) 
-                             & (0U == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)));
     vlSelf->tb_top__DOT__u_ut__DOT__accept = ((0U == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)) 
                                               & (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid));
+    vlSelf->tb_top__DOT__uart_ready_masked = ((IData)(vlSelf->sink_allow) 
+                                              & (0U 
+                                                 == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)));
+    vlSelf->tx_word_valid = ((IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid) 
+                             & (IData)(vlSelf->tb_top__DOT__uart_ready_masked));
+    vlSelf->l2t_stall = ((~ (IData)(vlSelf->tb_top__DOT__uart_ready_masked)) 
+                         & (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid));
 }
 
 VL_ATTR_COLD void Vtb_top___024root___eval_stl(Vtb_top___024root* vlSelf) {
@@ -120,6 +125,21 @@ VL_ATTR_COLD bool Vtb_top___024root___eval_phase__stl(Vtb_top___024root* vlSelf)
     }
     return (__VstlExecute);
 }
+
+#ifdef VL_DEBUG
+VL_ATTR_COLD void Vtb_top___024root___dump_triggers__ico(Vtb_top___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtb_top___024root___dump_triggers__ico\n"); );
+    // Body
+    if ((1U & (~ (IData)(vlSelf->__VicoTriggered.any())))) {
+        VL_DBG_MSGF("         No triggers active\n");
+    }
+    if ((1ULL & vlSelf->__VicoTriggered.word(0U))) {
+        VL_DBG_MSGF("         'ico' region trigger index 0 is active: Internal 'ico' trigger - first iteration\n");
+    }
+}
+#endif  // VL_DEBUG
 
 #ifdef VL_DEBUG
 VL_ATTR_COLD void Vtb_top___024root___dump_triggers__act(Vtb_top___024root* vlSelf) {
@@ -160,6 +180,7 @@ VL_ATTR_COLD void Vtb_top___024root___ctor_var_reset(Vtb_top___024root* vlSelf) 
     vlSelf->rst_n = VL_RAND_RESET_I(1);
     vlSelf->rx_byte = VL_RAND_RESET_I(8);
     vlSelf->rx_valid = VL_RAND_RESET_I(1);
+    vlSelf->sink_allow = VL_RAND_RESET_I(1);
     vlSelf->uart_tx = VL_RAND_RESET_I(1);
     vlSelf->payload_valid = VL_RAND_RESET_I(1);
     vlSelf->payload_byte = VL_RAND_RESET_I(8);
@@ -188,13 +209,17 @@ VL_ATTR_COLD void Vtb_top___024root___ctor_var_reset(Vtb_top___024root* vlSelf) 
     vlSelf->parsed_volume_reg = VL_RAND_RESET_I(32);
     vlSelf->tx_word_valid = VL_RAND_RESET_I(1);
     vlSelf->tx_word_data = VL_RAND_RESET_I(32);
+    vlSelf->l2t_stall = VL_RAND_RESET_I(1);
+    vlSelf->l2t_stall_cycles = VL_RAND_RESET_I(32);
     vlSelf->tb_top__DOT__parser_ready = VL_RAND_RESET_I(1);
+    vlSelf->tb_top__DOT__uart_ready_masked = VL_RAND_RESET_I(1);
+    vlSelf->tb_top__DOT__dummy_p2l_ready = VL_RAND_RESET_I(1);
+    vlSelf->tb_top__DOT__unused_parser_ready = VL_RAND_RESET_I(1);
     vlSelf->tb_top__DOT__t_ingress_unused = VL_RAND_RESET_I(32);
     vlSelf->tb_top__DOT__decision_type = VL_RAND_RESET_I(8);
     vlSelf->tb_top__DOT__decision_data = VL_RAND_RESET_I(32);
     vlSelf->tb_top__DOT__parser_msg_start = VL_RAND_RESET_I(1);
     vlSelf->tb_top__DOT__rx2p_out_ready = VL_RAND_RESET_I(1);
-    vlSelf->tb_top__DOT__p2l_ready = VL_RAND_RESET_I(1);
     vlSelf->tb_top__DOT__u_prg__DOT__rx2p_data = VL_RAND_RESET_I(8);
     vlSelf->tb_top__DOT__u_prg__DOT__rx2p_data_valid = VL_RAND_RESET_I(1);
     vlSelf->tb_top__DOT__u_prg__DOT__p2l_type_reg = VL_RAND_RESET_I(8);

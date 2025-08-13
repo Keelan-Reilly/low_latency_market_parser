@@ -6,6 +6,7 @@ module tb_top (
   input  logic        rst_n,
   input  logic [7:0]  rx_byte,
   input  logic        rx_valid,
+  input  logic        sink_allow,  // 1=allow UART accept, 0=stall
 
   // Observed by C++ harness
   output logic        uart_tx,
@@ -40,7 +41,9 @@ module tb_top (
   output logic [31:0] parsed_volume_reg,
   // Add these outputs in the port list
   output logic        tx_word_valid,
-  output logic [31:0] tx_word_data
+  output logic [31:0] tx_word_data,
+  output logic        l2t_stall,          // NEW: stage-3 has data but sink not ready
+  output logic [31:0] l2t_stall_cycles     // NEW: total stall cycles seen at stage-3
 );
 
   
@@ -50,6 +53,8 @@ module tb_top (
   logic parser_ready;
   logic logic_ready;
   logic uart_ready;
+  logic uart_ready_masked; 
+
   logic dummy_p2l_ready;
   logic unused_parser_ready; // parser's output
   logic [31:0] t_ingress_unused;
@@ -76,7 +81,6 @@ module tb_top (
 
   // 2) PARSER → LOGIC pipeline stage
 
-  logic        p2l_ready;
   logic [7:0]  p2l_type_out;
   logic [63:0] p2l_order_id_out;
   logic [31:0] p2l_price_out;
@@ -85,7 +89,6 @@ module tb_top (
 
 
   // 3) LOGIC → UART pipeline stage
-  logic        l2t_ready;
   logic [7:0]  l2t_type_out;
   logic [31:0] l2t_data_out;
   logic        l2t_out_valid;
@@ -110,7 +113,7 @@ module tb_top (
     .p2l_order_id    (order_id),
     .p2l_price       (price),
     .p2l_volume      (volume),
-    .p2l_ready       (dummy_p2l_ready),
+    .p2l_ready       (),
     .p2l_type_out    (p2l_type_out),
     .p2l_order_id_out(p2l_order_id_out),
     .p2l_price_out   (p2l_price_out),
@@ -122,11 +125,11 @@ module tb_top (
     .l2t_type        (decision_type),
     .l2t_valid       (decision_valid),
     .l2t_data        (decision_data),
-    .l2t_ready       (l2t_ready),
+    .l2t_ready       (),
     .l2t_type_out    (l2t_type_out),
     .l2t_data_out    (l2t_data_out),
     .l2t_out_valid   (l2t_out_valid),
-    .l2t_out_ready   (uart_ready),
+    .l2t_out_ready   (uart_ready_masked),
 
     // Timestamp tagging
     .cycle_cnt       (cycle_cnt),
@@ -142,8 +145,17 @@ module tb_top (
   assign parsed_type_reg   = p2l_type_out;
   assign parsed_price_reg  = p2l_price_out;
   assign parsed_volume_reg = p2l_volume_out;
-  assign tx_word_valid = l2t_out_valid & uart_ready;
+
+  assign uart_ready_masked = uart_ready & sink_allow;
+  assign l2t_stall = l2t_out_valid & ~uart_ready_masked;
+  assign tx_word_valid = l2t_out_valid & uart_ready_masked;
   assign tx_word_data  = l2t_data_out;
+
+  
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) l2t_stall_cycles <= 32'd0;
+    else if (l2t_stall) l2t_stall_cycles <= l2t_stall_cycles + 1;
+  end
 
   // ----------------------------------------------------------------
   // 5) Instantiate each stage, now wired through pipeline_regs
@@ -174,7 +186,7 @@ module tb_top (
     .rst_n     (rst_n),
     .in_byte   (rx2p_out),
     .in_valid  (rx2p_out_valid),
-    .in_ready  (unused_parser_ready),
+    .in_ready  (),
     .msg_type  (msg_type),
     .field_valid(field_valid),
     .order_id  (order_id),

@@ -25,6 +25,7 @@ module parser (
     // counters
     logic [15:0] cnt;        // bytes since TYPE (i.e., within message body)
     logic [15:0] body_left;  // (length - 1) bytes remaining after TYPE
+    
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

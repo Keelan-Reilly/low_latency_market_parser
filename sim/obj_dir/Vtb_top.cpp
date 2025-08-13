@@ -14,6 +14,7 @@ Vtb_top::Vtb_top(VerilatedContext* _vcontextp__, const char* _vcname__)
     , rst_n{vlSymsp->TOP.rst_n}
     , rx_byte{vlSymsp->TOP.rx_byte}
     , rx_valid{vlSymsp->TOP.rx_valid}
+    , sink_allow{vlSymsp->TOP.sink_allow}
     , uart_tx{vlSymsp->TOP.uart_tx}
     , payload_valid{vlSymsp->TOP.payload_valid}
     , payload_byte{vlSymsp->TOP.payload_byte}
@@ -25,6 +26,7 @@ Vtb_top::Vtb_top(VerilatedContext* _vcontextp__, const char* _vcname__)
     , parsed_valid_reg{vlSymsp->TOP.parsed_valid_reg}
     , parsed_type_reg{vlSymsp->TOP.parsed_type_reg}
     , tx_word_valid{vlSymsp->TOP.tx_word_valid}
+    , l2t_stall{vlSymsp->TOP.l2t_stall}
     , dbg_payload_len{vlSymsp->TOP.dbg_payload_len}
     , dbg_total_payload{vlSymsp->TOP.dbg_total_payload}
     , dbg_payload_cnt_last{vlSymsp->TOP.dbg_payload_cnt_last}
@@ -41,6 +43,7 @@ Vtb_top::Vtb_top(VerilatedContext* _vcontextp__, const char* _vcname__)
     , parsed_price_reg{vlSymsp->TOP.parsed_price_reg}
     , parsed_volume_reg{vlSymsp->TOP.parsed_volume_reg}
     , tx_word_data{vlSymsp->TOP.tx_word_data}
+    , l2t_stall_cycles{vlSymsp->TOP.l2t_stall_cycles}
     , order_id{vlSymsp->TOP.order_id}
     , rootp{&(vlSymsp->TOP)}
 {

@@ -5,6 +5,47 @@
 #include "Vtb_top__pch.h"
 #include "Vtb_top___024root.h"
 
+VL_INLINE_OPT void Vtb_top___024root___ico_sequent__TOP__0(Vtb_top___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtb_top___024root___ico_sequent__TOP__0\n"); );
+    // Body
+    vlSelf->tb_top__DOT__uart_ready_masked = ((IData)(vlSelf->sink_allow) 
+                                              & (0U 
+                                                 == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)));
+    vlSelf->tx_word_valid = ((IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid) 
+                             & (IData)(vlSelf->tb_top__DOT__uart_ready_masked));
+    vlSelf->l2t_stall = ((~ (IData)(vlSelf->tb_top__DOT__uart_ready_masked)) 
+                         & (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid));
+}
+
+void Vtb_top___024root___eval_ico(Vtb_top___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtb_top___024root___eval_ico\n"); );
+    // Body
+    if ((1ULL & vlSelf->__VicoTriggered.word(0U))) {
+        Vtb_top___024root___ico_sequent__TOP__0(vlSelf);
+    }
+}
+
+void Vtb_top___024root___eval_triggers__ico(Vtb_top___024root* vlSelf);
+
+bool Vtb_top___024root___eval_phase__ico(Vtb_top___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtb_top___024root___eval_phase__ico\n"); );
+    // Init
+    CData/*0:0*/ __VicoExecute;
+    // Body
+    Vtb_top___024root___eval_triggers__ico(vlSelf);
+    __VicoExecute = vlSelf->__VicoTriggered.any();
+    if (__VicoExecute) {
+        Vtb_top___024root___eval_ico(vlSelf);
+    }
+    return (__VicoExecute);
+}
+
 void Vtb_top___024root___eval_act(Vtb_top___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -96,6 +137,10 @@ VL_INLINE_OPT void Vtb_top___024root___nba_sequent__TOP__0(Vtb_top___024root* vl
     vlSelf->tb_top__DOT__u_prg__DOT__p2l_data_valid 
         = ((IData)(vlSelf->rst_n) && (IData)(vlSelf->field_valid));
     if (vlSelf->rst_n) {
+        if (vlSelf->l2t_stall) {
+            vlSelf->l2t_stall_cycles = ((IData)(1U) 
+                                        + vlSelf->l2t_stall_cycles);
+        }
         __Vdly__cycle_cnt = ((IData)(1U) + vlSelf->cycle_cnt);
         if ((((IData)(vlSelf->parsed_valid_reg) & (0x50U 
                                                    == (IData)(vlSelf->parsed_type_reg))) 
@@ -176,6 +221,7 @@ VL_INLINE_OPT void Vtb_top___024root___nba_sequent__TOP__0(Vtb_top___024root* vl
         vlSelf->tb_top__DOT__u_ut__DOT__byte_idx = __Vdly__tb_top__DOT__u_ut__DOT__byte_idx;
         vlSelf->tb_top__DOT__u_ut__DOT__sh = __Vdly__tb_top__DOT__u_ut__DOT__sh;
         vlSelf->tb_top__DOT__u_ut__DOT__bit_idx = __Vdly__tb_top__DOT__u_ut__DOT__bit_idx;
+        vlSelf->tb_top__DOT__u_ut__DOT__st = __Vdly__tb_top__DOT__u_ut__DOT__st;
         if (vlSelf->field_valid) {
             vlSelf->tb_top__DOT__u_prg__DOT__p2l_volume_reg 
                 = vlSelf->volume;
@@ -184,12 +230,12 @@ VL_INLINE_OPT void Vtb_top___024root___nba_sequent__TOP__0(Vtb_top___024root* vl
             vlSelf->tb_top__DOT__u_prg__DOT__p2l_type_reg 
                 = vlSelf->msg_type;
         }
-        if (((0U == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)) 
+        if (((IData)(vlSelf->tb_top__DOT__uart_ready_masked) 
              & (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid))) {
             __Vdly__tb_top__DOT__u_prg__DOT__l2t_data_valid = 0U;
         }
         if ((((~ (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid)) 
-              | (0U == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st))) 
+              | (IData)(vlSelf->tb_top__DOT__uart_ready_masked)) 
              & (IData)(vlSelf->decision_valid))) {
             vlSelf->tb_top__DOT__u_prg__DOT__l2t_type_reg 
                 = vlSelf->tb_top__DOT__decision_type;
@@ -206,6 +252,7 @@ VL_INLINE_OPT void Vtb_top___024root___nba_sequent__TOP__0(Vtb_top___024root* vl
                 = vlSelf->tb_top__DOT__u_prg__DOT__ingress_s2;
         }
     } else {
+        vlSelf->l2t_stall_cycles = 0U;
         __Vdly__cycle_cnt = 0U;
         vlSelf->tb_top__DOT__u_tl__DOT__d_volume = 0U;
         __Vdly__tb_top__DOT__u_ut__DOT__tick_cnt = 0U;
@@ -219,6 +266,7 @@ VL_INLINE_OPT void Vtb_top___024root___nba_sequent__TOP__0(Vtb_top___024root* vl
         vlSelf->tb_top__DOT__u_ut__DOT__byte_idx = __Vdly__tb_top__DOT__u_ut__DOT__byte_idx;
         vlSelf->tb_top__DOT__u_ut__DOT__sh = __Vdly__tb_top__DOT__u_ut__DOT__sh;
         vlSelf->tb_top__DOT__u_ut__DOT__bit_idx = __Vdly__tb_top__DOT__u_ut__DOT__bit_idx;
+        vlSelf->tb_top__DOT__u_ut__DOT__st = __Vdly__tb_top__DOT__u_ut__DOT__st;
         vlSelf->tb_top__DOT__u_prg__DOT__p2l_volume_reg = 0U;
         vlSelf->tb_top__DOT__u_prg__DOT__p2l_price_reg = 0U;
         vlSelf->tb_top__DOT__u_tl__DOT__d_order_id = 0ULL;
@@ -231,23 +279,27 @@ VL_INLINE_OPT void Vtb_top___024root___nba_sequent__TOP__0(Vtb_top___024root* vl
         vlSelf->tb_top__DOT__u_prg__DOT__t_logic_cap = 0U;
         vlSelf->tb_top__DOT__u_prg__DOT__t_decision_cap = 0U;
     }
-    vlSelf->tb_top__DOT__u_ut__DOT__st = __Vdly__tb_top__DOT__u_ut__DOT__st;
     vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid 
         = __Vdly__tb_top__DOT__u_prg__DOT__l2t_data_valid;
+    vlSelf->tb_top__DOT__uart_ready_masked = ((IData)(vlSelf->sink_allow) 
+                                              & (0U 
+                                                 == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)));
     vlSelf->parsed_volume_reg = vlSelf->tb_top__DOT__u_prg__DOT__p2l_volume_reg;
     vlSelf->tx_word_data = vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_reg;
     vlSelf->t_logic = vlSelf->tb_top__DOT__u_prg__DOT__t_logic_cap;
     vlSelf->t_decision = vlSelf->tb_top__DOT__u_prg__DOT__t_decision_cap;
     vlSelf->t_parser = vlSelf->tb_top__DOT__u_prg__DOT__t_parser_cap;
     vlSelf->t_ingress = vlSelf->tb_top__DOT__u_prg__DOT__t_ingress_cap;
-    vlSelf->tx_word_valid = ((IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid) 
-                             & (0U == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)));
     vlSelf->tb_top__DOT__u_ut__DOT__accept = ((0U == (IData)(vlSelf->tb_top__DOT__u_ut__DOT__st)) 
                                               & (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid));
     vlSelf->decision_valid = ((IData)(vlSelf->rst_n) 
                               && (((IData)(vlSelf->parsed_valid_reg) 
                                    & (0x50U == (IData)(vlSelf->parsed_type_reg))) 
                                   & (0x1e8480U > vlSelf->parsed_price_reg)));
+    vlSelf->tx_word_valid = ((IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid) 
+                             & (IData)(vlSelf->tb_top__DOT__uart_ready_masked));
+    vlSelf->l2t_stall = ((~ (IData)(vlSelf->tb_top__DOT__uart_ready_masked)) 
+                         & (IData)(vlSelf->tb_top__DOT__u_prg__DOT__l2t_data_valid));
     if (vlSelf->rst_n) {
         if (vlSelf->field_valid) {
             vlSelf->tb_top__DOT__u_prg__DOT__p2l_order_id_reg 
@@ -696,6 +748,9 @@ bool Vtb_top___024root___eval_phase__nba(Vtb_top___024root* vlSelf) {
 }
 
 #ifdef VL_DEBUG
+VL_ATTR_COLD void Vtb_top___024root___dump_triggers__ico(Vtb_top___024root* vlSelf);
+#endif  // VL_DEBUG
+#ifdef VL_DEBUG
 VL_ATTR_COLD void Vtb_top___024root___dump_triggers__nba(Vtb_top___024root* vlSelf);
 #endif  // VL_DEBUG
 #ifdef VL_DEBUG
@@ -707,9 +762,28 @@ void Vtb_top___024root___eval(Vtb_top___024root* vlSelf) {
     Vtb_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtb_top___024root___eval\n"); );
     // Init
+    IData/*31:0*/ __VicoIterCount;
+    CData/*0:0*/ __VicoContinue;
     IData/*31:0*/ __VnbaIterCount;
     CData/*0:0*/ __VnbaContinue;
     // Body
+    __VicoIterCount = 0U;
+    vlSelf->__VicoFirstIteration = 1U;
+    __VicoContinue = 1U;
+    while (__VicoContinue) {
+        if (VL_UNLIKELY((0x64U < __VicoIterCount))) {
+#ifdef VL_DEBUG
+            Vtb_top___024root___dump_triggers__ico(vlSelf);
+#endif
+            VL_FATAL_MT("tb_top.sv", 3, "", "Input combinational region did not converge.");
+        }
+        __VicoIterCount = ((IData)(1U) + __VicoIterCount);
+        __VicoContinue = 0U;
+        if (Vtb_top___024root___eval_phase__ico(vlSelf)) {
+            __VicoContinue = 1U;
+        }
+        vlSelf->__VicoFirstIteration = 0U;
+    }
     __VnbaIterCount = 0U;
     __VnbaContinue = 1U;
     while (__VnbaContinue) {
@@ -755,5 +829,7 @@ void Vtb_top___024root___eval_debug_assertions(Vtb_top___024root* vlSelf) {
         Verilated::overWidthError("rst_n");}
     if (VL_UNLIKELY((vlSelf->rx_valid & 0xfeU))) {
         Verilated::overWidthError("rx_valid");}
+    if (VL_UNLIKELY((vlSelf->sink_allow & 0xfeU))) {
+        Verilated::overWidthError("sink_allow");}
 }
 #endif  // VL_DEBUG

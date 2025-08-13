@@ -29,6 +29,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     VL_IN8(&rst_n,0,0);
     VL_IN8(&rx_byte,7,0);
     VL_IN8(&rx_valid,0,0);
+    VL_IN8(&sink_allow,0,0);
     VL_OUT8(&uart_tx,0,0);
     VL_OUT8(&payload_valid,0,0);
     VL_OUT8(&payload_byte,7,0);
@@ -40,6 +41,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     VL_OUT8(&parsed_valid_reg,0,0);
     VL_OUT8(&parsed_type_reg,7,0);
     VL_OUT8(&tx_word_valid,0,0);
+    VL_OUT8(&l2t_stall,0,0);
     VL_OUT16(&dbg_payload_len,15,0);
     VL_OUT16(&dbg_total_payload,15,0);
     VL_OUT16(&dbg_payload_cnt_last,15,0);
@@ -56,6 +58,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top VL_NOT_FINAL : public VerilatedModel 
     VL_OUT(&parsed_price_reg,31,0);
     VL_OUT(&parsed_volume_reg,31,0);
     VL_OUT(&tx_word_data,31,0);
+    VL_OUT(&l2t_stall_cycles,31,0);
     VL_OUT64(&order_id,63,0);
 
     // CELLS

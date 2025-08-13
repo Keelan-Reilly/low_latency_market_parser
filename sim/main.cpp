@@ -28,13 +28,14 @@ int main(int argc, char** argv) {
     std::ofstream decision_out("../sim/decision_log.txt");
     std::ofstream crc_out     ("../sim/crc_log.txt");
     std::ofstream lat_out     ("../sim/latencies.csv");
-
+    std::ofstream bp_out      ("../sim/backpressure_log.txt");
     lat_out << "ingress,parser,logic,decision,parser_lat,logic_lat,total_lat\n";
 
     // -------- Reset --------
     top->clk      = 0;
     top->rst_n    = 0;
     top->rx_valid = 0;
+    top->sink_allow = 1;
     top->eval();
     for (int i = 0; i < 10; i++) {
         top->clk = !top->clk;
@@ -45,6 +46,20 @@ int main(int argc, char** argv) {
 
     // -------- Helpers (edge-detected TX logging, event logging) --------
     bool prev_tx_word_valid = false;
+    int stall_ctr = 0;
+
+     auto apply_backpressure = [&](){
+        // Periodic stall: 200 cycles stall every 2000 cycles (deterministic)
+        stall_ctr = (stall_ctr + 1) % 2000;
+        bool allow = (stall_ctr < 1800);    // 1800 allow, 200 stall
+        top->sink_allow = allow ? 1 : 0;
+    };
+
+    auto log_backpressure = [&](){
+        if (top->l2t_stall) {
+            bp_out << "STALL @" << top->cycle_cnt << "\n";
+        }
+    };
 
     auto log_txword_edge = [&]() {
         bool cur = top->tx_word_valid;
@@ -121,6 +136,7 @@ int main(int argc, char** argv) {
     };
 
     auto tick_one_cycle = [&](){
+        apply_backpressure();  // set sink_allow before cycle
         top->clk = 0; top->eval();
         top->clk = 1; top->eval();
 
@@ -134,6 +150,9 @@ int main(int argc, char** argv) {
         log_latency_on_tx_accept();
         log_txword_edge();
         log_decision();
+        log_backpressure();
+
+        prev_tx_word_valid = top->tx_word_valid;
     };
 
     // -------- Feed bytes (one full cycle per byte) --------

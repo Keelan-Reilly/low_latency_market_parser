@@ -188,4 +188,19 @@ module pipeline_regs (
     assign t_decision = t_decision_cap;
     assign t_parser_event = p2l_timestamp;
 
+    
+    `ifdef ASSERT_ON
+        // Handshake stability: when stalled, data must hold
+        // (Verilator supports a subset of SVA; guard if needed)
+        // Stage 1
+        assert property (@(posedge clk) disable iff(!rst_n)
+            rx2p_out_valid && !rx2p_out_ready |-> $stable(rx2p_out));
+        // Stage 2
+        assert property (@(posedge clk) disable iff(!rst_n)
+            p2l_out_valid && !p2l_out_ready |-> $stable({p2l_type_out,p2l_order_id_out,p2l_price_out,p2l_volume_out}));
+        // Stage 3
+        assert property (@(posedge clk) disable iff(!rst_n)
+            l2t_out_valid && !l2t_out_ready |-> $stable({l2t_type_out,l2t_data_out}));
+    `endif
+
 endmodule
