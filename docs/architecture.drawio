@@ -2,126 +2,151 @@
   <diagram name="Page-1" id="J_EEAmPL-U2qeaOY9AWo">
     <mxGraphModel dx="3405" dy="1444" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-63" value="clk, rst_n" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="40" width="120" height="40" as="geometry" />
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Clock / reset -->
+        <mxCell id="clk_rst" value="clk, rst_n" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="120" height="40" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-64" value="Ethernet PHY" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="-390" y="210" width="140" height="60" as="geometry" />
+
+        <!-- Source / Sink -->
+        <mxCell id="phy" value="Ethernet PHY" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="-390" y="210" width="140" height="60" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-65" value="eth_rx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="-80" y="200" width="140" height="80" as="geometry" />
+        <mxCell id="host" value="Host / Logger" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="2210" y="210" width="160" height="60" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-66" value="pipe_reg #1" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="230" y="210" width="100" height="60" as="geometry" />
+
+        <!-- Blocks -->
+        <mxCell id="eth_rx" value="eth_rx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="-80" y="200" width="160" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-67" value="parser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="540" y="200" width="160" height="80" as="geometry" />
+        <mxCell id="pipe1" value="pipeline reg #1" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="210" width="120" height="60" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-68" value="pipe_reg #2" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="960" y="210" width="100" height="60" as="geometry" />
+        <mxCell id="parser" value="parser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="200" width="180" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-69" value="trading_logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="1260" y="200" width="160" height="80" as="geometry" />
+        <mxCell id="pipe2" value="pipeline reg #2" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="210" width="120" height="60" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-70" value="pipe_reg #3" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="1710" y="210" width="100" height="60" as="geometry" />
+        <mxCell id="logic" value="trading_logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="200" width="200" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-71" value="uart_tx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="1980" y="200" width="140" height="80" as="geometry" />
+        <mxCell id="pipe3" value="pipeline reg #3" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1710" y="210" width="120" height="60" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-72" value="Host / Logger" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=1;" vertex="1" parent="1">
-          <mxGeometry x="2210" y="210" width="140" height="60" as="geometry" />
+        <mxCell id="uart" value="uart_tx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1980" y="200" width="160" height="80" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-73" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-63" target="xDNAbFq9gRd_a2N7sp2u-65">
-          <mxGeometry relative="1" as="geometry" />
+
+        <!-- Clock distribution -->
+        <mxCell id="clk_to_eth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="clk_rst" target="eth_rx">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-63" target="xDNAbFq9gRd_a2N7sp2u-69">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="clk_to_parser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="clk_rst" target="parser">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-76" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-63" target="xDNAbFq9gRd_a2N7sp2u-71">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="clk_to_logic" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="clk_rst" target="logic">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-77" value="in_byte[7:0], in_valid" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-64" target="xDNAbFq9gRd_a2N7sp2u-65">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="clk_to_uart" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;arrowhead=none;" edge="1" parent="1" source="clk_rst" target="uart">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-78" value="out_byte[7:0], out_valid" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-65" target="xDNAbFq9gRd_a2N7sp2u-66">
+
+        <!-- PHY -> eth_rx -->
+        <mxCell id="e_phy_eth" value="rx_byte, rx_valid" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="phy" target="eth_rx">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- eth_rx -> pipe1 -->
+        <mxCell id="e_eth_pipe1" value="payload_byte, payload_valid / payload_ready" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="eth_rx" target="pipe1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="230" y="240" />
-              <mxPoint x="230" y="240" />
+              <mxPoint x="230" y="240"/>
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-79" value="upd_byte[7:0], upd_valid" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-66" target="xDNAbFq9gRd_a2N7sp2u-67">
+
+        <!-- pipe1 -> parser -->
+        <mxCell id="e_pipe1_parser" value="in_byte, in_valid / in_ready" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="pipe1" target="parser">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="470" y="240" />
-              <mxPoint x="470" y="240" />
+              <mxPoint x="470" y="240"/>
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-80" value="msg_type[7:0], price[31:0],&amp;nbsp;&lt;div&gt;&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;size[31:0], msg_valid&lt;/span&gt;&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-67" target="xDNAbFq9gRd_a2N7sp2u-68">
-          <mxGeometry x="-0.037" relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="960" y="240" />
-              <mxPoint x="960" y="240" />
-            </Array>
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-81" value="msg_type, price, size, valid" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-68" target="xDNAbFq9gRd_a2N7sp2u-69">
+
+        <!-- parser -> pipe2 -->
+        <mxCell id="e_parser_pipe2" value="msg_type, order_id, price, volume, field_valid / p2l_ready" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="parser" target="pipe2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1110" y="240" />
-              <mxPoint x="1110" y="240" />
+              <mxPoint x="960" y="240"/>
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-82" value="decision_order_id[63:0], decision_price[31:0],&lt;div&gt;decision_size[31:0], decision_valid&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-69" target="xDNAbFq9gRd_a2N7sp2u-70">
+
+        <!-- pipe2 -> trading_logic -->
+        <mxCell id="e_pipe2_logic" value="msg_type, order_id, price, volume, valid / ready" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="pipe2" target="logic">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1710" y="240" />
+              <mxPoint x="1110" y="240"/>
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-83" value="data_in[7:0], data_valid" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-70" target="xDNAbFq9gRd_a2N7sp2u-71">
+
+        <!-- trading_logic -> pipe3 -->
+        <mxCell id="e_logic_pipe3" value="decision_type, decision_data, decision_valid / l2t_ready" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="logic" target="pipe3">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1820" y="240" />
-              <mxPoint x="1820" y="240" />
+              <mxPoint x="1710" y="240"/>
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-84" value="tx_line" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-71" target="xDNAbFq9gRd_a2N7sp2u-72">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-85" value="in_ready" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-67" target="xDNAbFq9gRd_a2N7sp2u-66">
+
+        <!-- pipe3 -> uart -->
+        <mxCell id="e_pipe3_uart" value="data_in, data_valid / ready" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="pipe3" target="uart">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="600" y="320" />
-              <mxPoint x="280" y="320" />
+              <mxPoint x="1820" y="240"/>
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-86" value="in_ready" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-69" target="xDNAbFq9gRd_a2N7sp2u-68">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="930" y="330" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="1340" y="320" />
-              <mxPoint x="1010" y="320" />
-            </Array>
-          </mxGeometry>
+
+        <!-- uart -> host -->
+        <mxCell id="e_uart_host" value="tx_line" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="uart" target="host">
+          <mxGeometry relative="1" as="geometry"/>
         </mxCell>
-        <mxCell id="xDNAbFq9gRd_a2N7sp2u-87" value="data_ready" style="edgeStyle=orthogonalEdgeStyle;dashed=1;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="xDNAbFq9gRd_a2N7sp2u-71" target="xDNAbFq9gRd_a2N7sp2u-70">
+
+        <!-- CRC tap: eth_rx -> host -->
+        <mxCell id="e_crc_tap" value="crc_ok / crc_valid" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;" edge="1" parent="1" source="eth_rx" target="host">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="2040" y="320" />
-              <mxPoint x="1760" y="320" />
+              <mxPoint x="2100" y="180"/>
             </Array>
           </mxGeometry>
         </mxCell>
+
+        <!-- Timestamp tap: pipe3 -> host (aggregated) -->
+        <mxCell id="e_ts_tap" value="t_ingress, t_parser, t_logic, t_decision" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;" edge="1" parent="1" source="pipe3" target="host">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2100" y="300"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- msg_start from parser (for ingress tagging) to pipe2 (shown as dashed) -->
+        <mxCell id="e_msg_start" value="msg_start" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="parser" target="pipe2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="320"/>
+              <mxPoint x="1010" y="320"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
       </root>
     </mxGraphModel>
   </diagram>

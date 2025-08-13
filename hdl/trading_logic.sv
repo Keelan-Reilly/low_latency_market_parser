@@ -1,5 +1,11 @@
 `timescale 1ns/1ps
 
+// Module: trading_logic
+//
+// Purpose:
+//   Consume parsed ITCH fields and issue a simple trading decision.
+//   Current rule: for 'P' (Trade, non-cross) messages, BUY when price < THRESHOLD.
+
 module trading_logic #(
     parameter int THRESHOLD = 2_000_000  // Adjusted threshold above example trade price 10000
 ) (

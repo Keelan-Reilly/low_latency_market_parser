@@ -1,5 +1,28 @@
-#include "Vtb_top.h"
-#include "verilated.h"
+// Verilator Testbench for tb_top
+//
+// Purpose:
+//   Simulates the top-level FPGA design (tb_top) by feeding in
+//   Ethernet + ITCH packet data, driving the clock/reset, and
+//   logging various internal events to multiple output files.
+//
+// Key features:
+//   • Loads a binary packet capture and feeds bytes to DUT
+//   • Applies periodic backpressure to simulate downstream stalls
+//   • Logs UART TX output, parsed payload, parser events,
+//     decision outputs, CRC check results, and latency breakdowns
+//   • Drains the pipeline to allow UART transmission to complete
+//
+// Outputs:
+//   - output_capture.txt       : UART bitstream log
+//   - payload_capture.txt      : Hex dump of payload bytes
+//   - parser_log.txt           : Parsed message fields + TX words
+//   - decision_log.txt         : Decision outputs from trading logic
+//   - crc_log.txt              : Ethernet CRC pass/fail with debug info
+//   - latencies.csv            : Timestamps & computed latencies
+//   - backpressure_log.txt     : Records stall events
+
+#include "Vtb_top.h"           // Verilated model header for top module
+#include "verilated.h"         // Verilator core API
 
 #include <fstream>
 #include <vector>
@@ -10,10 +33,14 @@
 #include <string>
 
 int main(int argc, char** argv) {
+
+    // Pass command-line arguments into Verilated simulation
     Verilated::commandArgs(argc, argv);
+
+    // Instantiate the top-level DUT
     Vtb_top* top = new Vtb_top;
 
-    // -------- Load raw Ethernet+ITCH frames --------
+    // Load raw Ethernet+ITCH frames
     std::vector<uint8_t> packet_bytes;
     {
         std::ifstream in("../messages/packets.bin", std::ios::binary);
@@ -21,7 +48,7 @@ int main(int argc, char** argv) {
                             std::istreambuf_iterator<char>());
     }
 
-    // -------- Open outputs --------
+    // Open output files
     std::ofstream uart_out    ("../sim/output_capture.txt");
     std::ofstream payload_out ("../sim/payload_capture.txt");
     std::ofstream parser_out  ("../sim/parser_log.txt");
@@ -31,36 +58,42 @@ int main(int argc, char** argv) {
     std::ofstream bp_out      ("../sim/backpressure_log.txt");
     lat_out << "ingress,parser,logic,decision,parser_lat,logic_lat,total_lat\n";
 
-    // -------- Reset --------
+    // Reset DUT
     top->clk      = 0;
     top->rst_n    = 0;
     top->rx_valid = 0;
     top->sink_allow = 1;
     top->eval();
+
+    // 10 half-cycles with reset asserted
     for (int i = 0; i < 10; i++) {
         top->clk = !top->clk;
         top->eval();
     }
+
+    // Deassert reset
     top->rst_n = 1;
     top->eval();
 
-    // -------- Helpers (edge-detected TX logging, event logging) --------
-    bool prev_tx_word_valid = false;
-    int stall_ctr = 0;
+    // Helpers for event logging
+    bool prev_tx_word_valid = false;   // edge detection state
+    int stall_ctr = 0;                // backpressure counter
 
-     auto apply_backpressure = [&](){
-        // Periodic stall: 200 cycles stall every 2000 cycles (deterministic)
+    // Simulate periodic downstream backpressure (200 cycles stall / 2000 cycles total)
+    auto apply_backpressure = [&](){
         stall_ctr = (stall_ctr + 1) % 2000;
         bool allow = (stall_ctr < 1800);    // 1800 allow, 200 stall
         top->sink_allow = allow ? 1 : 0;
     };
 
+    // Log when the downstream is stalled
     auto log_backpressure = [&](){
         if (top->l2t_stall) {
             bp_out << "STALL @" << top->cycle_cnt << "\n";
         }
     };
 
+    // Log when TX word valid rises
     auto log_txword_edge = [&]() {
         bool cur = top->tx_word_valid;
         if (cur && !prev_tx_word_valid) {
@@ -70,6 +103,7 @@ int main(int argc, char** argv) {
         }
     };
 
+    // Log parsed ITCH message fields
     auto log_parser = [&]() {
         if (top->parsed_valid_reg) {
             parser_out << "PARSED @" << top->t_parser_event
@@ -79,6 +113,7 @@ int main(int argc, char** argv) {
         }
     };
 
+    // Log decision output events
     auto log_decision = [&]() {
         bool cur = top->tx_word_valid;
         if (cur && !prev_tx_word_valid) {
@@ -88,6 +123,7 @@ int main(int argc, char** argv) {
         }
     };
 
+    // Log Ethernet CRC results with debug counters
     auto log_crc = [&]() {
         if (top->eth_crc_valid) {
             crc_out << std::hex
@@ -102,10 +138,12 @@ int main(int argc, char** argv) {
         }
     };
 
+    // Log latency from ingress to parser to logic to decision
     auto log_latency_on_tx_accept = [&]() {
         bool cur = top->tx_word_valid;
         if (cur && !prev_tx_word_valid) {
-            // Compute latencies *from raw timestamps* here
+
+            // Compute latencies from raw timestamps
             auto U32 = [](uint64_t x){ return static_cast<uint32_t>(x); };
             const uint64_t MOD = 1ull<<32;
 
@@ -128,6 +166,7 @@ int main(int argc, char** argv) {
         }
     };
 
+    // Log payload bytes in hex
     auto log_payload = [&]() {
         if (top->payload_valid) {
             payload_out << std::hex << std::setw(2) << std::setfill('0')
@@ -135,12 +174,13 @@ int main(int argc, char** argv) {
         }
     };
 
+    // Advance simulation by one full clock cycle and log all events
     auto tick_one_cycle = [&](){
-        apply_backpressure();  // set sink_allow before cycle
+        apply_backpressure();  // update sink_allow before tick
         top->clk = 0; top->eval();
         top->clk = 1; top->eval();
 
-        // capture exactly once per full clock
+        // UART TX bit capture (once per full cycle)
         uart_out << int(top->uart_tx) << "\n";
 
         // log events once per cycle (prevents duplicates)
@@ -155,7 +195,7 @@ int main(int argc, char** argv) {
         prev_tx_word_valid = top->tx_word_valid;
     };
 
-    // -------- Feed bytes (one full cycle per byte) --------
+    // Feed packet bytes into DUT (1 cycle per byte)
     for (auto byte : packet_bytes) {
         top->rx_byte  = byte;
         top->rx_valid = 1;
@@ -163,17 +203,17 @@ int main(int argc, char** argv) {
         tick_one_cycle(); // one full cycle per byte
     }
 
-    // -------- Drain: stop driving input, let pipeline/UART finish --------
+    // Stop driving input; let pipeline drain
     top->rx_valid = 0;
     top->eval();
 
-    // Give plenty of time for UART (slow) to flush; ~2M cycles is safe
+    // Give plenty of time for slow UART to flush; ~2M cycles is safe
     const int timeout_cycles = 2'000'000;
     for (int i = 0; i < timeout_cycles; ++i) {
-        tick_one_cycle(); // one full cycle
+        tick_one_cycle();
     }
 
-    // -------- Tidy --------
+    // Close logs and cleanup
     uart_out.close();
     payload_out.close();
     parser_out.close();
