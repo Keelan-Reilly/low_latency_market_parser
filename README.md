@@ -10,10 +10,18 @@ A tiny, end-to-end market-data pipeline:
 ---
 
 ### Key Results
+- **Latency:** ~192 ns ingress→decision at 250 MHz (48 cycles) in simulation.
+- **Footprint:** Lossless backpressure, tiny hardware resource use.
+- **Clock target:** Design closes at 250 MHz with headroom.
 
-- **Latency:** ~**192 ns** ingress→decision at 250 MHz based on **48 cycles** measured in sim.
-- **Headroom:** Design meets **250 MHz** timing with small positive slack.
-- **Footprint:** Tiny resource usage (<<1% LUT/FF, no BRAM/DSP), and **12 I/O** only.
+---
+
+### FPGA Build
+- **Device:** xc7a200tfbg676-2
+- **Top module:** `fpga_top.sv` instantiates all stages and UART output.
+- **Timing:** Meets 250 MHz constraint with WNS +0.009 ns.
+- **Resources:** LUT 0.16 %, FF 0.14 %, no BRAM/DSP.
+- **Reports:** `vivado/` folder contains `utilization.rpt`, `timing_summary.rpt`, `messages.log`.
 
 ---
 
@@ -21,6 +29,8 @@ A tiny, end-to-end market-data pipeline:
 
 ### RTL modules (SystemVerilog)
 
+
+- **`hdl/fpga_top.sv`** — Synthesis top-level for Vivado; instantiates Ethernet RX, parser, trading logic, pipeline registers, and UART TX.
 - **`hdl/eth_rx.sv`** — Ethernet byte-stream receiver. Detects preamble/SFD, filters Destination MAC (our MAC or broadcast), streams payload, computes CRC-32 (IEEE 802.3), checks FCS.
 - **`hdl/parser.sv`** — ITCH message parser. Reads length (2B) + type (1B). For type ‘P’ (Trade, non-cross) it extracts order_id, price, volume.
 - **`hdl/trading_logic.sv`** — Very simple rule: if type='P' and price < THRESHOLD, emit a decision.
@@ -235,6 +245,7 @@ When backpressure is active, you’ll see PARSED events continue (parser output 
 │  ├─ design_notes.md             # Architecture, FSMs, latency, tests
 │  └─ timing_diagram.svg          # UART / handshake timing diagram
 ├─ hdl/
+│  ├─ fpga_top.sv                 # Top-level module for FPGA synthesis
 │  ├─ eth_rx.sv                   # Ethernet RX
 │  ├─ parser.sv                   # ITCH parser
 │  ├─ pipeline_regs.sv            # Stage boundary registers
@@ -260,6 +271,10 @@ When backpressure is active, you’ll see PARSED events continue (parser output 
 │  ├─ build_itch_from_gzpart.py   # .gz.part → packets.bin + sample.mem
 │  ├─ decode_uart.py              # Optional: UART log decoder
 │  └─ run_sim.sh                  # Build & run script
+├─ vivado/
+│  ├─ messages.log                # Synthesis and Implementation log
+│  ├─ timing_summary.rpt          # Timing closure summary
+│  └─ utilization.rpt             # Resource usage
 ├─ itch_sample.gz.part            # Sample ITCH input (truncated gzip)
 └─ README.md
 
