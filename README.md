@@ -1,6 +1,8 @@
 # Ultra-Low-Latency FPGA Trading Interface
 
-A tiny, end-to-end market-data pipeline:
+This project is a small, end-to-end trading system built on FPGA hardware. It takes in a market-data feed, parses it, applies a simple trading rule, and sends out a decision — all in under 200 nanoseconds. It demonstrates how FPGA pipelines can be used for ultra-low-latency decision-making in a realistic market-data processing workflow.
+
+Pipeline:
 
 - Ethernet byte stream → ITCH parser → simple trading rule → UART transmit
 - Deterministic ready/valid handshakes with lossless backpressure
