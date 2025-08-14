@@ -1,6 +1,6 @@
 # Ultra-Low-Latency FPGA Trading Interface
 
-This project is a small, end-to-end trading system built on FPGA hardware. It takes in a market-data feed, parses it, applies a simple trading rule, and sends out a decision — all in under 200 nanoseconds. It demonstrates how FPGA pipelines can be used for ultra-low-latency decision-making in a realistic market-data processing workflow.
+This project is a small, end-to-end trading system built on FPGA hardware. It takes in a market-data feed, parses it, applies a simple trading rule, and sends out a decision in under 200 nanoseconds. It demonstrates how FPGA pipelines can be used for ultra-low-latency decision-making in a realistic market-data processing workflow.
 
 Pipeline:
 
@@ -298,4 +298,5 @@ FCS is stored LSB-first (wire order). The receiver computes CRC with the reflect
 - **CRC fails** — Make sure `packets.bin` wasn’t edited; the generator recomputes FCS per frame.
 
 - **No TX words for some PARSED lines** — The rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
+
 
