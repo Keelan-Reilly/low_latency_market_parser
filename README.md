@@ -242,8 +242,7 @@ When backpressure is active, you’ll see PARSED events continue (parser output 
 │  └─ reference_parser.py         # Offline “golden” parser + CRC
 ├─ docs/
 │  ├─ architecture.drawio         # Block diagram (draw.io)
-│  ├─ design_notes.md             # Architecture, FSMs, latency, tests
-│  └─ timing_diagram.svg          # UART / handshake timing diagram
+│  └─ design_notes.md             # Architecture, FSMs, latency, tests
 ├─ hdl/
 │  ├─ fpga_top.sv                 # Top-level module for FPGA synthesis
 │  ├─ eth_rx.sv                   # Ethernet RX
