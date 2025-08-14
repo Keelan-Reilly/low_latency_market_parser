@@ -10,7 +10,7 @@ A tiny, end-to-end market-data pipeline:
 ---
 
 ### Key Results
-- **Latency:** ~192 ns ingress→decision at 250 MHz (48 cycles) in simulation.
+- **Latency:** ~192 ns ingress→decision at 250 MHz (48 cycles in simulation, confirmed by post-route Vivado timing).
 - **Footprint:** Lossless backpressure, tiny hardware resource use.
 - **Clock target:** Design closes at 250 MHz with headroom.
 
