@@ -128,10 +128,15 @@ The interface receives and processes Ethernet frames containing market data.
 - Post-route resource and timing reports are stored in `vivado/` for reproducibility.
 ---
 
-## 7. Next Steps
+## 7. Potential Optimisations
 
-- Expand decision logic into a limit order book.
-- Handle multiple input streams.
-- Adapt for higher-speed Ethernet (10G+).
+While the current design prioritises correctness and functional completeness, there are clear opportunities to reduce latency further:
+
+- Cut-through parsing: Begin parsing fields as bytes arrive, rather than waiting for the full payload.
+-Wider datapath: Process multiple bytes per cycle (e.g., 32- or 64-bit) to reduce parser cycles.
+-Stage merging: Combine parser output and trading logic into a single cycle to reduce register boundaries.
+-Speculative decision emission: Issue a decision before CRC check completion and retract if the CRC fails.
+
+Based on cycle counts, these changes could reduce end-to-end latency from 48 cycles (~192 ns) to ~12–20 cycles (~40–80 ns) at 250–300 MHz.
 
 ---
