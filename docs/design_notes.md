@@ -57,6 +57,18 @@ The interface receives and processes Ethernet frames containing market data.
 - Sits between each processing stage to improve timing stability.
 - Captures timestamps at each stage for per-stage latency measurement.
 
+### FPGA Top-Level (`fpga_top.sv`)
+
+- Instantiates all core modules: Ethernet RX, message parser, decision logic, UART transmitter, and pipeline registers.
+- Connects stage-to-stage handshakes, routes timing signals for latency measurement, and exposes I/O pins for external interfaces.
+- Wraps the design for synthesis/implementation in Vivado with a 250 MHz clock constraint.
+
+### Simulation Top-Level (`tb_top.sv`)
+
+- Drives the DUT (Device Under Test) with Ethernet+ITCH payloads from packets.bin via a behavioural PHY model.
+- Captures UART output, stage-by-stage timestamps, CRC logs, and decision events for verification.
+- Used exclusively in Verilator for latency measurement and functional testing before synthesis.
+
 ---
 
 ## 3. State Machine Summaries
@@ -113,7 +125,7 @@ The interface receives and processes Ethernet frames containing market data.
   - CRC results
   - Latency breakdown
 - Expected vs actual behaviour compared against a Python reference parser.
-
+- Post-route resource and timing reports are stored in `vivado/` for reproducibility.
 ---
 
 ## 7. Next Steps
