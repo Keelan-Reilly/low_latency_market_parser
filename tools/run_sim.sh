@@ -15,8 +15,9 @@ set -x
 
 # Build with auto-main (no main.cpp)
 verilator --cc --exe --build \
-    --trace \
+    --trace --trace-structs --trace-max-array 1024 --trace-depth 99 \
     --timing \
+    --hierarchical \
     --error-limit 0 \
     --Wno-TIMESCALEMOD \
     --Wno-WIDTHEXPAND \

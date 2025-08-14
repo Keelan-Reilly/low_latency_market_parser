@@ -23,6 +23,7 @@
 
 #include "Vtb_top.h"           // Verilated model header for top module
 #include "verilated.h"         // Verilator core API
+#include "verilated_vcd_c.h"    // Verilator VCD API
 
 #include <fstream>
 #include <vector>
@@ -39,6 +40,12 @@ int main(int argc, char** argv) {
 
     // Instantiate the top-level DUT
     Vtb_top* top = new Vtb_top;
+
+    // ----- VCD tracing setup -----
+    Verilated::traceEverOn(true);
+    auto* tfp = new VerilatedVcdC;
+    top->trace(tfp, 99);         // 99 = deep hierarchy
+    tfp->open("../sim/vlt_dump.vcd");
 
     // Load raw Ethernet+ITCH frames
     std::vector<uint8_t> packet_bytes;
@@ -176,9 +183,14 @@ int main(int argc, char** argv) {
 
     // Advance simulation by one full clock cycle and log all events
     auto tick_one_cycle = [&](){
+        static vluint64_t main_time = 0;
         apply_backpressure();  // update sink_allow before tick
+
         top->clk = 0; top->eval();
+        tfp->dump(main_time++); // dump VCD trace at rising edge
+
         top->clk = 1; top->eval();
+        tfp->dump(main_time++); // dump VCD trace at falling edge
 
         // UART TX bit capture (once per full cycle)
         uart_out << int(top->uart_tx) << "\n";
@@ -220,7 +232,9 @@ int main(int argc, char** argv) {
     decision_out.close();
     crc_out.close();
     lat_out.close();
+    tfp->close();
 
+    delete tfp;
     delete top;
     return 0;
 }

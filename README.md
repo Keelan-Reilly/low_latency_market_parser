@@ -266,7 +266,7 @@ When backpressure is active, you’ll see PARSED events continue (parser output 
 │  ├─ reference_decisions.csv     # Expected DECISION events
 │  ├─ reference_parsed.csv        # Expected PARSED events
 │  ├─ tb_top.sv                   # Top-level SV testbench
-│  └─ vlt_dump.vcd                 # Waveform dump (GTKWave)
+│  └─ vlt_dump.vcd                # Waveform dump (GTKWave)
 ├─ tools/
 │  ├─ build_itch_from_gzpart.py   # .gz.part → packets.bin + sample.mem
 │  ├─ decode_uart.py              # Optional: UART log decoder
@@ -296,5 +296,5 @@ FCS is stored LSB-first (wire order). The receiver computes CRC with the reflect
 - **No ‘P’ trades near the start** — Use `--skip` to jump ahead (e.g., `--skip 240000`).
 - **CRC fails** — Make sure `packets.bin` wasn’t edited; the generator recomputes FCS per frame.
 
-- **No TX words for some PARSED lines** — Your rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
+- **No TX words for some PARSED lines** — The rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
 

@@ -1,105 +1,108 @@
 `timescale 1ns/1ps
 
-module tb_top (
-  // Driven by C++ harness
-  input  logic        clk,
-  input  logic        rst_n,
-  input  logic [7:0]  rx_byte,
-  input  logic        rx_valid,
-  input  logic        sink_allow,  // 1=allow UART accept, 0=stall
+// Top-level testbench harness
+// - Acts as a Verilator sim top with all I/O routed to the C++ driver
+// - Provides hooks for pipeline stage observation, CRC debug, and stall metrics
 
-  // Observed by C++ harness
-  output logic        uart_tx,
-  output logic        payload_valid,
-  output logic [7:0]  payload_byte,
-  output logic        field_valid,
-  output logic [7:0]  msg_type,
-  output logic        decision_valid,
-  output logic [63:0] order_id,
-  output logic [31:0] price,
-  output logic [31:0] volume,
-  output logic        eth_crc_ok, // New
-  output logic        eth_crc_valid, // New
-  // Timestamp outputs
+module tb_top (
+
+  // Inputs driven by C++ harness
+  input  logic        clk,         // System clock
+  input  logic        rst_n,       // Active-low reset
+  input  logic [7:0]  rx_byte,     // Incoming byte from Ethernet PHY
+  input  logic        rx_valid,    // Byte valid strobe
+  input  logic        sink_allow,  // Controls UART acceptance (0 = stall sink)
+
+  // Outputs observed by C++ harness
+  output logic        uart_tx,        // UART TX line
+  output logic        payload_valid,  // ETH RX → Parser byte valid
+  output logic [7:0]  payload_byte,   // ETH RX → Parser byte data
+  output logic        field_valid,    // Parser emits a valid ITCH field
+  output logic [7:0]  msg_type,       // Parsed ITCH message type
+  output logic        decision_valid, // Trading logic emits decision
+  output logic [63:0] order_id,       // Parsed order ID
+  output logic [31:0] price,          // Parsed price
+  output logic [31:0] volume,         // Parsed volume
+  output logic        eth_crc_ok,     // Ethernet CRC pass
+  output logic        eth_crc_valid,  // Ethernet CRC result valid
+
+  // Timestamp markers (cycle counts) for latency profiling
   output logic [31:0] t_ingress,
-  output logic [31:0] t_parser,   // New
-  output logic [31:0] t_parser_event, // New
-  output logic [31:0] t_logic,    // New
+  output logic [31:0] t_parser,
+  output logic [31:0] t_parser_event,
+  output logic [31:0] t_logic,
   output logic [31:0] t_decision,
   output logic [31:0] cycle_cnt,
 
-  output logic [31:0] dbg_crc_calc,  //debug
+  // CRC debug taps
+  output logic [31:0] dbg_crc_calc,
   output logic [31:0] dbg_crc_recv,
   output logic [15:0] dbg_payload_len,
   output logic [15:0] dbg_total_payload,
   output logic [15:0] dbg_payload_cnt_last,
 
-  // NEW: registered parser outputs (for C++ logging)
+  // Registered parser outputs (for clean C++ logging)
   output logic        parsed_valid_reg,
   output logic [7:0]  parsed_type_reg,
   output logic [31:0] parsed_price_reg,
   output logic [31:0] parsed_volume_reg,
-  // Add these outputs in the port list
+
+  // Logic to TX observability & stall metrics
   output logic        tx_word_valid,
   output logic [31:0] tx_word_data,
-  output logic        l2t_stall,          // NEW: stage-3 has data but sink not ready
-  output logic [31:0] l2t_stall_cycles     // NEW: total stall cycles seen at stage-3
+  output logic        l2t_stall,         // TX stage has data but sink not ready
+  output logic [31:0] l2t_stall_cycles   // Cumulative stall cycles
 );
 
-  
+  // Internal back-pressure signal
 
-  // Back-pressure (always ready)
-  logic payload_ready;
-  logic parser_ready;
-  logic logic_ready;
-  logic uart_ready;
-  logic uart_ready_masked; 
+  logic payload_ready;        // ETH RX ready
+  logic parser_ready;         // Parser ready
+  logic logic_ready;          // Trading logic ready
+  logic uart_ready;           // UART TX ready
+  logic uart_ready_masked;    // UART ready gated by sink_allow
 
   logic dummy_p2l_ready;
-  logic unused_parser_ready; // parser's output
+  logic unused_parser_ready;
   logic [31:0] t_ingress_unused;
 
-
-  // Intermediate wires
+  // Intermediate wires between stages
   wire [7:0]  decision_type;
   wire [31:0] decision_data;
   wire        uart_busy;
   wire        parser_msg_start;
 
-  // Cycle counter for timestamps
+  // Global cycle counter (used for latency stamps)
 
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) cycle_cnt <= 0;
     else        cycle_cnt <= cycle_cnt + 1;
   end
 
-  // ----------------------------------------------------------------
-  // 1) ETH → PARSER pipeline stage
+  // Pipeline stage handoff wires
+  // Ethernet RX to Parser
   logic [7:0]  rx2p_out;
   logic        rx2p_out_valid;
   logic        rx2p_out_ready;
 
-  // 2) PARSER → LOGIC pipeline stage
-
+  // Parser to Trading Logic
   logic [7:0]  p2l_type_out;
   logic [63:0] p2l_order_id_out;
   logic [31:0] p2l_price_out;
   logic [31:0] p2l_volume_out;
   logic        p2l_out_valid;
 
-
-  // 3) LOGIC → UART pipeline stage
+  // Trading Logic to UART
   logic [7:0]  l2t_type_out;
   logic [31:0] l2t_data_out;
   logic        l2t_out_valid;
 
-  // ----------------------------------------------------------------
-  // 4) Instantiate the pipeline_regs block
+  // Pipeline register block (timestamps + ready/valid bridges)
   pipeline_regs u_prg (
     .clk             (clk),
     .rst_n           (rst_n),
 
-    // ETH → Parser
+    // Ethernet RX to Parser
     .rx2p_in         (payload_byte),
     .rx2p_valid      (payload_valid),
     .rx2p_ready      (payload_ready),
@@ -107,7 +110,7 @@ module tb_top (
     .rx2p_out_valid  (rx2p_out_valid),
     .rx2p_out_ready  (1'b1),
 
-    // Parser → Logic
+    // Parser to Trading Logic
     .p2l_type        (msg_type),
     .p2l_valid       (field_valid),
     .p2l_order_id    (order_id),
@@ -121,7 +124,7 @@ module tb_top (
     .p2l_out_valid   (p2l_out_valid),
     .p2l_out_ready   (logic_ready),
 
-    // Logic → TX
+    // Trading Logic to UART
     .l2t_type        (decision_type),
     .l2t_valid       (decision_valid),
     .l2t_data        (decision_data),
@@ -135,32 +138,31 @@ module tb_top (
     .cycle_cnt       (cycle_cnt),
     .t_ingress       (t_ingress),
     .t_parser        (t_parser),
-    .t_parser_event  (t_parser_event), // New
+    .t_parser_event  (t_parser_event),
     .t_logic         (t_logic),
     .t_decision      (t_decision),
     .msg_start       (parser_msg_start)
   );
 
+  // Register parser outputs for clean external logging
   assign parsed_valid_reg  = p2l_out_valid;
   assign parsed_type_reg   = p2l_type_out;
   assign parsed_price_reg  = p2l_price_out;
   assign parsed_volume_reg = p2l_volume_out;
 
+  // Stall + TX word tracking
   assign uart_ready_masked = uart_ready & sink_allow;
   assign l2t_stall = l2t_out_valid & ~uart_ready_masked;
   assign tx_word_valid = l2t_out_valid & uart_ready_masked;
   assign tx_word_data  = l2t_data_out;
 
-  
   always_ff @(posedge clk or negedge rst_n) begin
     if (!rst_n) l2t_stall_cycles <= 32'd0;
     else if (l2t_stall) l2t_stall_cycles <= l2t_stall_cycles + 1;
   end
 
-  // ----------------------------------------------------------------
-  // 5) Instantiate each stage, now wired through pipeline_regs
+  // Stage 1: Ethernet RX (MAC + CRC)
 
-  // Ethernet RX
   eth_rx u_eth (
     .clk           (clk),
     .rst_n         (rst_n),
@@ -169,10 +171,10 @@ module tb_top (
     .payload_byte  (payload_byte),
     .payload_valid (payload_valid),
     .payload_ready (payload_ready),
-    .crc_ok        (eth_crc_ok), // New
-    .crc_valid     (eth_crc_valid), // New
+    .crc_ok        (eth_crc_ok),
+    .crc_valid     (eth_crc_valid),
 
-    // debug
+    // Debug taps
     .dbg_crc_calc        (dbg_crc_calc),
     .dbg_crc_recv        (dbg_crc_recv),
     .dbg_payload_len     (dbg_payload_len),
@@ -180,7 +182,7 @@ module tb_top (
     .dbg_payload_cnt_last(dbg_payload_cnt_last)
   );
 
-  // Parser gets its inputs from the first pipeline stage
+  // Stage 2: ITCH Parser
   parser u_pr (
     .clk       (clk),
     .rst_n     (rst_n),
@@ -195,7 +197,7 @@ module tb_top (
     .msg_start (parser_msg_start)  
   );
 
-  // Trading logic gets its inputs from the second pipeline stage
+  // Stage 3: Trading Logic
   trading_logic u_tl (
     .clk           (clk),
     .rst_n         (rst_n),
@@ -209,16 +211,16 @@ module tb_top (
     .d_order_id    (),
     .d_price       (decision_data),
     .d_volume      (),
-    .in_ready      (logic_ready)           // To pipeline_regs
+    .in_ready      (logic_ready)
   );
 
-  // UART TX gets its inputs from the third pipeline stage
+  // Stage 4: UART TX
   uart_tx u_ut (
     .clk       (clk),
     .rst_n     (rst_n),
     .data_in   (l2t_data_out),
     .data_valid(l2t_out_valid),
-    .ready(uart_ready),              // To pipeline_regs
+    .ready     (uart_ready),
     .tx_line   (uart_tx),
     .busy      (uart_busy)
   );
