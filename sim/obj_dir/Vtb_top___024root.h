@@ -76,7 +76,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         SData/*15:0*/ tb_top__DOT__u_pr__DOT__length;
         SData/*15:0*/ tb_top__DOT__u_pr__DOT__cnt;
         SData/*15:0*/ tb_top__DOT__u_pr__DOT__body_left;
-        SData/*9:0*/ tb_top__DOT__u_ut__DOT__tick_cnt;
+        SData/*11:0*/ tb_top__DOT__u_ut__DOT__tick_cnt;
         VL_OUT(price,31,0);
         VL_OUT(volume,31,0);
         VL_OUT(t_ingress,31,0);
@@ -109,14 +109,14 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         IData/*31:0*/ tb_top__DOT__u_eth__DOT__crc_recv_shift;
         IData/*31:0*/ tb_top__DOT__u_eth__DOT__next_crc;
         IData/*31:0*/ tb_top__DOT__u_eth__DOT__fcs_word;
-        IData/*31:0*/ tb_top__DOT__u_eth__DOT__unnamedblk3__DOT__new_fcs;
+        IData/*31:0*/ tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__new_fcs;
         IData/*31:0*/ tb_top__DOT__u_tl__DOT__d_volume;
         IData/*31:0*/ tb_top__DOT__u_ut__DOT__word_reg;
         IData/*31:0*/ __VactIterCount;
         VL_OUT64(order_id,63,0);
         QData/*63:0*/ tb_top__DOT__u_prg__DOT__p2l_order_id_reg;
         QData/*47:0*/ tb_top__DOT__u_eth__DOT__dest_mac_shift;
-        QData/*47:0*/ tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__full_dest;
+        QData/*47:0*/ tb_top__DOT__u_eth__DOT__full_dest;
         QData/*63:0*/ tb_top__DOT__u_tl__DOT__d_order_id;
         VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
     };

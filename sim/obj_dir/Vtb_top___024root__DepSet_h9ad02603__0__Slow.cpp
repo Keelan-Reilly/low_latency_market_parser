@@ -252,8 +252,8 @@ VL_ATTR_COLD void Vtb_top___024root___ctor_var_reset(Vtb_top___024root* vlSelf) 
     vlSelf->tb_top__DOT__u_eth__DOT__fcs_word = VL_RAND_RESET_I(32);
     vlSelf->tb_top__DOT__u_eth__DOT__total_payload = VL_RAND_RESET_I(16);
     vlSelf->tb_top__DOT__u_eth__DOT__crc_started = VL_RAND_RESET_I(1);
-    vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__full_dest = VL_RAND_RESET_Q(48);
-    vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk3__DOT__new_fcs = VL_RAND_RESET_I(32);
+    vlSelf->tb_top__DOT__u_eth__DOT__full_dest = VL_RAND_RESET_Q(48);
+    vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__new_fcs = VL_RAND_RESET_I(32);
     vlSelf->tb_top__DOT__u_pr__DOT__state = VL_RAND_RESET_I(2);
     vlSelf->tb_top__DOT__u_pr__DOT__length = VL_RAND_RESET_I(16);
     vlSelf->tb_top__DOT__u_pr__DOT__len_hi = VL_RAND_RESET_I(8);
@@ -263,7 +263,7 @@ VL_ATTR_COLD void Vtb_top___024root___ctor_var_reset(Vtb_top___024root* vlSelf) 
     vlSelf->tb_top__DOT__u_pr__DOT__body_left = VL_RAND_RESET_I(16);
     vlSelf->tb_top__DOT__u_tl__DOT__d_order_id = VL_RAND_RESET_Q(64);
     vlSelf->tb_top__DOT__u_tl__DOT__d_volume = VL_RAND_RESET_I(32);
-    vlSelf->tb_top__DOT__u_ut__DOT__tick_cnt = VL_RAND_RESET_I(10);
+    vlSelf->tb_top__DOT__u_ut__DOT__tick_cnt = VL_RAND_RESET_I(12);
     vlSelf->tb_top__DOT__u_ut__DOT__st = VL_RAND_RESET_I(2);
     vlSelf->tb_top__DOT__u_ut__DOT__word_reg = VL_RAND_RESET_I(32);
     vlSelf->tb_top__DOT__u_ut__DOT__byte_idx = VL_RAND_RESET_I(2);

@@ -49,8 +49,8 @@ void Vtb_top___024root__trace_chg_0_sub_0(Vtb_top___024root* vlSelf, VerilatedVc
         bufp->chgIData(oldp+24,(vlSelf->tb_top__DOT__u_eth__DOT__fcs_word),32);
         bufp->chgSData(oldp+25,(vlSelf->tb_top__DOT__u_eth__DOT__total_payload),16);
         bufp->chgBit(oldp+26,(vlSelf->tb_top__DOT__u_eth__DOT__crc_started));
-        bufp->chgQData(oldp+27,(vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__full_dest),48);
-        bufp->chgIData(oldp+29,(vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk3__DOT__new_fcs),32);
+        bufp->chgQData(oldp+27,(vlSelf->tb_top__DOT__u_eth__DOT__full_dest),48);
+        bufp->chgIData(oldp+29,(vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__new_fcs),32);
         bufp->chgCData(oldp+30,(vlSelf->tb_top__DOT__u_pr__DOT__state),2);
         bufp->chgSData(oldp+31,(vlSelf->tb_top__DOT__u_pr__DOT__length),16);
         bufp->chgCData(oldp+32,(vlSelf->tb_top__DOT__u_pr__DOT__len_hi),8);
@@ -72,7 +72,7 @@ void Vtb_top___024root__trace_chg_0_sub_0(Vtb_top___024root* vlSelf, VerilatedVc
         bufp->chgIData(oldp+48,(vlSelf->tb_top__DOT__u_prg__DOT__t_decision_cap),32);
         bufp->chgQData(oldp+49,(vlSelf->tb_top__DOT__u_tl__DOT__d_order_id),64);
         bufp->chgIData(oldp+51,(vlSelf->tb_top__DOT__u_tl__DOT__d_volume),32);
-        bufp->chgSData(oldp+52,(vlSelf->tb_top__DOT__u_ut__DOT__tick_cnt),10);
+        bufp->chgSData(oldp+52,(vlSelf->tb_top__DOT__u_ut__DOT__tick_cnt),12);
         bufp->chgCData(oldp+53,(vlSelf->tb_top__DOT__u_ut__DOT__st),2);
         bufp->chgIData(oldp+54,(vlSelf->tb_top__DOT__u_ut__DOT__word_reg),32);
         bufp->chgCData(oldp+55,(vlSelf->tb_top__DOT__u_ut__DOT__byte_idx),2);

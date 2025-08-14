@@ -137,10 +137,8 @@ VL_ATTR_COLD void Vtb_top___024root__trace_init_sub__TOP__0(Vtb_top___024root* v
     tracep->declBus(c+25,0,"fcs_word",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 31,0);
     tracep->declBus(c+26,0,"total_payload",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 15,0);
     tracep->declBit(c+27,0,"crc_started",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1);
-    tracep->pushPrefix("unnamedblk2", VerilatedTracePrefixType::SCOPE_MODULE);
     tracep->declQuad(c+28,0,"full_dest",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 47,0);
-    tracep->popPrefix();
-    tracep->pushPrefix("unnamedblk3", VerilatedTracePrefixType::SCOPE_MODULE);
+    tracep->pushPrefix("unnamedblk2", VerilatedTracePrefixType::SCOPE_MODULE);
     tracep->declBus(c+30,0,"new_fcs",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 31,0);
     tracep->popPrefix();
     tracep->popPrefix();
@@ -245,7 +243,7 @@ VL_ATTR_COLD void Vtb_top___024root__trace_init_sub__TOP__0(Vtb_top___024root* v
     tracep->declBit(c+4,0,"busy",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC, false,-1);
     tracep->declBit(c+1,0,"ready",-1, VerilatedTraceSigDirection::OUTPUT, VerilatedTraceSigKind::WIRE, VerilatedTraceSigType::LOGIC, false,-1);
     tracep->declBus(c+111,0,"BAUD_TICKS",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::PARAMETER, VerilatedTraceSigType::INT, false,-1, 31,0);
-    tracep->declBus(c+53,0,"tick_cnt",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 9,0);
+    tracep->declBus(c+53,0,"tick_cnt",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 11,0);
     tracep->declBus(c+54,0,"st",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 1,0);
     tracep->declBus(c+55,0,"word_reg",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 31,0);
     tracep->declBus(c+56,0,"byte_idx",-1, VerilatedTraceSigDirection::NONE, VerilatedTraceSigKind::VAR, VerilatedTraceSigType::LOGIC, false,-1, 1,0);
@@ -307,9 +305,9 @@ VL_ATTR_COLD void Vtb_top___024root__trace_const_0_sub_0(Vtb_top___024root* vlSe
     bufp->fullQData(oldp+104,(0x1122334455ULL),48);
     bufp->fullQData(oldp+106,(0xffffffffffffULL),48);
     bufp->fullIData(oldp+108,(0x1e8480U),32);
-    bufp->fullIData(oldp+109,(0x5f5e100U),32);
+    bufp->fullIData(oldp+109,(0xee6b280U),32);
     bufp->fullIData(oldp+110,(0x1c200U),32);
-    bufp->fullIData(oldp+111,(0x364U),32);
+    bufp->fullIData(oldp+111,(0x87aU),32);
 }
 
 VL_ATTR_COLD void Vtb_top___024root__trace_full_0_sub_0(Vtb_top___024root* vlSelf, VerilatedVcd::Buffer* bufp);
@@ -355,8 +353,8 @@ VL_ATTR_COLD void Vtb_top___024root__trace_full_0_sub_0(Vtb_top___024root* vlSel
     bufp->fullIData(oldp+25,(vlSelf->tb_top__DOT__u_eth__DOT__fcs_word),32);
     bufp->fullSData(oldp+26,(vlSelf->tb_top__DOT__u_eth__DOT__total_payload),16);
     bufp->fullBit(oldp+27,(vlSelf->tb_top__DOT__u_eth__DOT__crc_started));
-    bufp->fullQData(oldp+28,(vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__full_dest),48);
-    bufp->fullIData(oldp+30,(vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk3__DOT__new_fcs),32);
+    bufp->fullQData(oldp+28,(vlSelf->tb_top__DOT__u_eth__DOT__full_dest),48);
+    bufp->fullIData(oldp+30,(vlSelf->tb_top__DOT__u_eth__DOT__unnamedblk2__DOT__new_fcs),32);
     bufp->fullCData(oldp+31,(vlSelf->tb_top__DOT__u_pr__DOT__state),2);
     bufp->fullSData(oldp+32,(vlSelf->tb_top__DOT__u_pr__DOT__length),16);
     bufp->fullCData(oldp+33,(vlSelf->tb_top__DOT__u_pr__DOT__len_hi),8);
@@ -378,7 +376,7 @@ VL_ATTR_COLD void Vtb_top___024root__trace_full_0_sub_0(Vtb_top___024root* vlSel
     bufp->fullIData(oldp+49,(vlSelf->tb_top__DOT__u_prg__DOT__t_decision_cap),32);
     bufp->fullQData(oldp+50,(vlSelf->tb_top__DOT__u_tl__DOT__d_order_id),64);
     bufp->fullIData(oldp+52,(vlSelf->tb_top__DOT__u_tl__DOT__d_volume),32);
-    bufp->fullSData(oldp+53,(vlSelf->tb_top__DOT__u_ut__DOT__tick_cnt),10);
+    bufp->fullSData(oldp+53,(vlSelf->tb_top__DOT__u_ut__DOT__tick_cnt),12);
     bufp->fullCData(oldp+54,(vlSelf->tb_top__DOT__u_ut__DOT__st),2);
     bufp->fullIData(oldp+55,(vlSelf->tb_top__DOT__u_ut__DOT__word_reg),32);
     bufp->fullCData(oldp+56,(vlSelf->tb_top__DOT__u_ut__DOT__byte_idx),2);
