@@ -109,6 +109,7 @@ module eth_rx (
     logic [31:0]  fcs_word;         // latched final 32-bit FCS (LSB-first)
     logic [15:0]  total_payload;    // ITCH total bytes inside L2: len + 2 length bytes
     logic         crc_started;      // marker that we seeded CRC on SFD
+    logic [47:0]  full_dest;         // latched full destination MAC address
 
 
     // Main sequential block
@@ -204,7 +205,7 @@ module eth_rx (
                         // We shift left by one byte and drop the oldest byte, so after 6 bytes
                         // dest_mac_shift holds DA[47:0] in natural big-endian order (as on the wire).
                         if (hdr_cnt < 6) begin
-                            logic [47:0] full_dest = {dest_mac_shift[39:0], rx_byte};
+                            full_dest = {dest_mac_shift[39:0], rx_byte};
                             dest_mac_shift <= full_dest;
 
                             if (hdr_cnt == 5) begin

@@ -14,7 +14,7 @@
 //   • Busy stays high from the first start bit until the final stop bit.
 
 module uart_tx #(
-    parameter int CLK_FREQ_HZ = 100_000_000,
+    parameter int CLK_FREQ_HZ = 250_000_000,
     parameter int BAUD_RATE   = 115200
 ) (
     input  logic        clk,        
