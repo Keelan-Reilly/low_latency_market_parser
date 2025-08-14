@@ -4,6 +4,15 @@ These notes document the actual architecture, protocols, control logic, pipeline
 
 ---
 
+## Performance Summary
+
+- **Latency:** ~**192 ns** ingress→decision at 250 MHz (48 cycles in simulation)
+- **Timing:** Meets **250 MHz** on `xc7a200tfbg676-2` (WNS +0.009 ns, TNS 0)
+- **Resource usage:** ~0.4 % LUTs, ~0.3 % FFs, 12 I/Os
+- **Design state:** Fully routed with all constraints met
+
+---
+
 ## 1. Protocol Overviews
 
 ### 1.1 Ethernet Frame Format

@@ -9,6 +9,14 @@ A tiny, end-to-end market-data pipeline:
 
 ---
 
+### Key Results
+
+- **Latency:** ~**192 ns** ingress→decision at 250 MHz based on **48 cycles** measured in sim.
+- **Headroom:** Design meets **250 MHz** timing with small positive slack.
+- **Footprint:** Tiny resource usage (<<1% LUT/FF, no BRAM/DSP), and **12 I/O** only.
+
+---
+
 ## What this project contains
 
 ### RTL modules (SystemVerilog)
@@ -94,6 +102,53 @@ python bench/compare_outputs.py
 ```
 
 You will get `reference_parsed.csv` and (if the rule triggers) `reference_decisions.csv`, plus a pass/fail report from the comparator.
+
+---
+
+## Results
+
+### Functional (simulation)
+
+End-to-end latency measured from the Verilator log (`sim/latencies.csv`):
+
+| t_ingress | t_parser | t_logic | t_decision | parser_lat (cyc) | logic_lat (cyc) | total_lat (cyc) |
+|-----------|----------|---------|------------|------------------|-----------------|-----------------|
+| 239382    | 239428   | 239430  | 239430     | 46               | 2               | **48**          |
+| 239454    | 239500   | 239502  | 239502     | 46               | 2               | **48**          |
+| 496062    | 496108   | 496110  | 496110     | 46               | 2               | **48**          |
+| 894112    | 894158   | 894160  | 894160     | 46               | 2               | **48**          |
+| 1512407   | 1512453  | 1512455 | 1512455    | 46               | 2               | **48**          |
+
+> With the design clocked at **250 MHz** (see Vivado timing below), **48 cycles ≈ 192 ns** end-to-end  
+> (parser ≈ 46 cycles = 184 ns, logic ≈ 2 cycles = 8 ns).
+
+---
+
+### Implementation (Vivado 2025.1)
+
+**Device:** `xc7a200tfbg676-2` • **Design state:** Routed
+
+**Clocking**
+- `core_clk` waveform `{0.000 2.000}` → **Period 4.000 ns (250 MHz)**
+
+**Timing summary**
+- **All constraints met**
+- **WNS (setup): +0.009 ns**
+- **WHS (hold): +0.152 ns**
+- **PW slack:** +1.500 ns
+
+**Resource utilization**
+
+| Resource         | Used | Available | Util% |
+|------------------|-----:|----------:|-----:|
+| Slice LUTs       | 220  | 134,600   | 0.16 |
+| Slice Registers  | 383  | 269,200   | 0.14 |
+| BRAM (RAMB18/36) | 0    | 730 / 365 | 0.00 |
+| DSPs             | 0    | 740       | 0.00 |
+| BUFG             | 1    | 32        | 3.13 |
+| Bonded IOB       | 12   | 400       | 3.00 |
+
+_Primitive breakdown (top few):_ FDCE=373, LUT6=79, LUT3=69, CARRY4=28, IBUF=11, OBUF=1, BUFG=1.
 
 ---
 
