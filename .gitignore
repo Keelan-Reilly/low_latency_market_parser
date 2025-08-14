@@ -1,1 +1,6 @@
 *.vcd
+# Simulator artefacts
+*.vcd
+*.fst
+sim/obj_dir/
+sim/*.dat
