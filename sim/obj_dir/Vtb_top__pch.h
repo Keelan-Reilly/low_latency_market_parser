@@ -23,4 +23,6 @@
 #include "Vtb_top__Syms.h"
 #include "Vtb_top.h"
 
+// Additional include files added using '--compiler-include'
+
 #endif  // guard

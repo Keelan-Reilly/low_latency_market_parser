@@ -39,13 +39,14 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         CData/*0:0*/ tb_top__DOT__unused_parser_ready;
         CData/*7:0*/ tb_top__DOT__decision_type;
         CData/*0:0*/ tb_top__DOT__parser_msg_start;
+        CData/*7:0*/ tb_top__DOT__rx2p_out;
+        CData/*0:0*/ tb_top__DOT__rx2p_out_valid;
         CData/*0:0*/ tb_top__DOT__rx2p_out_ready;
-        CData/*7:0*/ tb_top__DOT__u_prg__DOT__rx2p_data;
-        CData/*0:0*/ tb_top__DOT__u_prg__DOT__rx2p_data_valid;
-        CData/*7:0*/ tb_top__DOT__u_prg__DOT__p2l_type_reg;
-        CData/*0:0*/ tb_top__DOT__u_prg__DOT__p2l_data_valid;
-        CData/*7:0*/ tb_top__DOT__u_prg__DOT__l2t_type_reg;
-        CData/*0:0*/ tb_top__DOT__u_prg__DOT__l2t_data_valid;
+        CData/*0:0*/ tb_top__DOT__l2t_out_valid;
+        CData/*0:0*/ tb_top__DOT__u_prg__DOT__s1__DOT__saved_valid;
+        CData/*7:0*/ tb_top__DOT__u_prg__DOT__s1__DOT__saved_data;
+        CData/*0:0*/ tb_top__DOT__u_prg__DOT__s2__DOT__saved_valid;
+        CData/*0:0*/ tb_top__DOT__u_prg__DOT__s3__DOT__saved_valid;
         CData/*2:0*/ tb_top__DOT__u_eth__DOT__state;
         CData/*2:0*/ tb_top__DOT__u_eth__DOT__pre_cnt;
         CData/*3:0*/ tb_top__DOT__u_eth__DOT__crc_cnt;
@@ -79,9 +80,9 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         SData/*11:0*/ tb_top__DOT__u_ut__DOT__tick_cnt;
         VL_OUT(price,31,0);
         VL_OUT(volume,31,0);
-        VL_OUT(t_ingress,31,0);
     };
     struct {
+        VL_OUT(t_ingress,31,0);
         VL_OUT(t_parser,31,0);
         VL_OUT(t_parser_event,31,0);
         VL_OUT(t_logic,31,0);
@@ -95,16 +96,9 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         VL_OUT(l2t_stall_cycles,31,0);
         IData/*31:0*/ tb_top__DOT__t_ingress_unused;
         IData/*31:0*/ tb_top__DOT__decision_data;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__p2l_price_reg;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__p2l_volume_reg;
         IData/*31:0*/ tb_top__DOT__u_prg__DOT__ingress_last;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__ingress_s2;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__p2l_timestamp;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__l2t_data_reg;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__t_ingress_cap;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__t_parser_cap;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__t_logic_cap;
-        IData/*31:0*/ tb_top__DOT__u_prg__DOT__t_decision_cap;
+        VlWide<7>/*199:0*/ tb_top__DOT__u_prg__DOT__s2__DOT__saved_data;
+        VlWide<6>/*167:0*/ tb_top__DOT__u_prg__DOT__s3__DOT__saved_data;
         IData/*31:0*/ tb_top__DOT__u_eth__DOT__crc_reg;
         IData/*31:0*/ tb_top__DOT__u_eth__DOT__crc_recv_shift;
         IData/*31:0*/ tb_top__DOT__u_eth__DOT__next_crc;
@@ -114,7 +108,10 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
         IData/*31:0*/ tb_top__DOT__u_ut__DOT__word_reg;
         IData/*31:0*/ __VactIterCount;
         VL_OUT64(order_id,63,0);
-        QData/*63:0*/ tb_top__DOT__u_prg__DOT__p2l_order_id_reg;
+        VlWide<7>/*199:0*/ tb_top__DOT__u_prg__DOT__p2l_bus_in;
+        VlWide<7>/*199:0*/ tb_top__DOT__u_prg__DOT__p2l_bus_out;
+        VlWide<6>/*167:0*/ tb_top__DOT__u_prg__DOT__l2t_bus_in;
+        VlWide<6>/*167:0*/ tb_top__DOT__u_prg__DOT__l2t_bus_out;
         QData/*47:0*/ tb_top__DOT__u_eth__DOT__dest_mac_shift;
         QData/*47:0*/ tb_top__DOT__u_eth__DOT__full_dest;
         QData/*63:0*/ tb_top__DOT__u_tl__DOT__d_order_id;
@@ -122,8 +119,8 @@ class alignas(VL_CACHE_LINE_BYTES) Vtb_top___024root final : public VerilatedMod
     };
     VlTriggerVec<1> __VstlTriggered;
     VlTriggerVec<1> __VicoTriggered;
-    VlTriggerVec<1> __VactTriggered;
-    VlTriggerVec<1> __VnbaTriggered;
+    VlTriggerVec<2> __VactTriggered;
+    VlTriggerVec<2> __VnbaTriggered;
 
     // INTERNAL VARIABLES
     Vtb_top__Syms* const vlSymsp;

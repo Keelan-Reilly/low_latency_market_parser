@@ -30,7 +30,7 @@ verilator --cc --exe --build \
     "$HDL_DIR"/pipeline_regs.sv \
     "$HDL_DIR"/trading_logic.sv \
     "$HDL_DIR"/uart_tx.sv \
-    tb_top.sv \
+    "$HDL_DIR"/tb_top.sv \
     main.cpp \
     -o sim_vlt
 

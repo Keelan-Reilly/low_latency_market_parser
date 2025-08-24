@@ -61,7 +61,6 @@ module parser (
     typedef enum logic [1:0] {
         WAIT_HEADER,
         READ_FIELDS,
-        DISPATCH,
         SKIP
     } state_t;
     state_t state;
@@ -145,20 +144,20 @@ module parser (
                         price    <= (price    << 8) | in_byte;  // 4 bytes total
                     end
 
+                    // EARLY FIRE: when price completes
+                    if (cnt == 16'd34) begin
+                    field_valid <= 1'b1;
+                    msg_type    <= type_reg;    // should be 8'h50 for 'P'
+                    end
+
                     // If done with this message body move to dispatch
                     if (cnt + 1 == body_left) begin
-                        state <= DISPATCH;
+                        state <= WAIT_HEADER;
                         cnt   <= 0;
                     end else begin
                         cnt <= cnt + 1;
                     end
                 end
-            end
-
-            DISPATCH: begin
-                field_valid <= 1'b1;
-                msg_type    <= type_reg;   // should be 8'h50 for 'P'
-                state       <= WAIT_HEADER;
             end
 
             SKIP: begin
