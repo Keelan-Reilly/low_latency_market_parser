@@ -5,14 +5,15 @@ This project is a small, end-to-end trading system built on FPGA hardware. It ta
 Pipeline:
 
 - Ethernet byte stream → ITCH parser → simple trading rule → UART transmit
-- Deterministic ready/valid handshakes with lossless backpressure
+- Fall-through ready/valid handshakes (1-deep skid buffers) with lossless backpressure
+- Early dispatch in parser (pulses on the last price byte), zero bubbles into trading logic
 - Cycle-accurate timestamps per message (ingress, parser exit, logic/decision)
 - Reference Python parser to cross-check RTL outputs
 
 ---
 
 ### Key Results
-- **Latency:** ~192 ns ingress→decision at 250 MHz (48 cycles in simulation, confirmed by post-route Vivado timing).
+- **Latency:** ~152 ns ingress→decision at 250 MHz (38 cycles in simulation).
 - **Footprint:** Lossless backpressure, tiny hardware resource use.
 - **Clock target:** Design closes at 250 MHz with headroom.
 
@@ -37,7 +38,7 @@ Pipeline:
 - **`hdl/parser.sv`** — ITCH message parser. Reads length (2B) + type (1B). For type ‘P’ (Trade, non-cross) it extracts order_id, price, volume.
 - **`hdl/trading_logic.sv`** — Very simple rule: if type='P' and price < THRESHOLD, emit a decision.
 - **`hdl/uart_tx.sv`** — UART transmitter. Sends a 32-bit word as 4 bytes (8N1), LSB-first within each byte, little-endian byte order.
-- **`hdl/pipeline_regs.sv`** — One-register boundaries between RX ↔ Parser, Parser ↔ Logic, Logic ↔ TX. Carries per-message timestamps so you can compute stage latencies.
+- **`hdl/pipeline_regs.sv`** — Fall-through stage boundaries (skid buffers) between RX ↔ Parser, Parser ↔ Logic, Logic ↔ TX. Carries per-message timestamps so you can compute stage latencies.
 
 ### Simulation (Verilator)
 
@@ -125,18 +126,17 @@ End-to-end latency measured from the Verilator log (`sim/latencies.csv`):
 
 | t_ingress | t_parser | t_logic | t_decision | parser_lat (cyc) | logic_lat (cyc) | total_lat (cyc) |
 |-----------|----------|---------|------------|------------------|-----------------|-----------------|
-| 239382    | 239428   | 239430  | 239430     | 46               | 2               | **48**          |
-| 239454    | 239500   | 239502  | 239502     | 46               | 2               | **48**          |
-| 496062    | 496108   | 496110  | 496110     | 46               | 2               | **48**          |
-| 894112    | 894158   | 894160  | 894160     | 46               | 2               | **48**          |
-| 1512407   | 1512453  | 1512455 | 1512455    | 46               | 2               | **48**          |
+| 239381    | 239419   | 239419  | 239419     | 38               | 0               | **38**          |
+| 239453    | 239491   | 239491  | 239491     | 38               | 0               | **38**          |
+| 496061    | 496099   | 496099  | 496099     | 38               | 0               | **38**          |
+| 894111    | 894149   | 894149  | 894149     | 38               | 0               | **38**          |
+| 1512406   | 1512444  | 1512444 | 1512444    | 38               | 0               | **38**          |
 
-> With the design clocked at **250 MHz** (see Vivado timing below), **48 cycles ≈ 192 ns** end-to-end  
-> (parser ≈ 46 cycles = 184 ns, logic ≈ 2 cycles = 8 ns).
+> With the design clocked at **250 MHz** (see Vivado timing below), **38 cycles ≈ 152 ns** end-to-end.
 
 ---
 
-### Implementation (Vivado 2025.1)
+### Implementation (Vivado 2025.1)  (Out of Date)
 
 **Device:** `xc7a200tfbg676-2` • **Design state:** Routed
 
@@ -192,8 +192,8 @@ python -m venv .venv && source .venv/bin/activate
 
 - Reads length MSB, length LSB, type.
 - For type 'P', accumulates big-endian order_id (8B), volume (4B), price (4B).
-- Pulses `field_valid` for one cycle with the decoded fields.
-- Pulses `msg_start` on the very first header byte so timestamps can align per message.
+- **Early-dispatch:** pulses `field_valid` *on the cycle the last price byte arrives* (no extra wait).
+- Never back-pressures upstream (`in_ready=1`).
 
 ### pipeline_regs
 
@@ -298,5 +298,6 @@ FCS is stored LSB-first (wire order). The receiver computes CRC with the reflect
 - **CRC fails** — Make sure `packets.bin` wasn’t edited; the generator recomputes FCS per frame.
 
 - **No TX words for some PARSED lines** — The rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
+
 
 
