@@ -1,6 +1,6 @@
 # Ultra-Low-Latency FPGA Trading Interface
 
-This project is a small, end-to-end trading system built on FPGA hardware. It takes in a market-data feed, parses it, applies a simple trading rule, and sends out a decision in under 200 nanoseconds. It demonstrates how FPGA pipelines can be used for ultra-low-latency decision-making in a realistic market-data processing workflow.
+This project is a small, end-to-end trading system built on FPGA hardware. It takes in a market-data feed, parses it, applies a simple trading rule, and sends out a decision in ~152 ns (38 cycles) from igress to output at 250 MHZ. It demonstrates how FPGA pipelines can be used for ultra-low-latency decision-making in a realistic market-data processing workflow.
 
 Pipeline:
 
@@ -19,11 +19,17 @@ Pipeline:
 
 ---
 
+### Recent Changes
+- Reduced parser/logic boundaries to remove bubbles
+- Early dispatch of parsed fields on last price byte
+- UART TX optimized to accept decisions without delay
+
+---
+
 ### FPGA Build
 - **Device:** xc7a200tfbg676-2
 - **Top module:** `fpga_top.sv` instantiates all stages and UART output.
-- **Timing:** Meets 250 MHz constraint with WNS +0.009 ns.
-- **Resources:** LUT 0.16 %, FF 0.14 %, no BRAM/DSP.
+- **Timing:** Meets 250 MHz constraint with WNS +0.009 ns. (OUT OF DATE)
 - **Reports:** `vivado/` folder contains `utilization.rpt`, `timing_summary.rpt`, `messages.log`.
 
 ---
@@ -39,12 +45,11 @@ Pipeline:
 - **`hdl/trading_logic.sv`** — Very simple rule: if type='P' and price < THRESHOLD, emit a decision.
 - **`hdl/uart_tx.sv`** — UART transmitter. Sends a 32-bit word as 4 bytes (8N1), LSB-first within each byte, little-endian byte order.
 - **`hdl/pipeline_regs.sv`** — Fall-through stage boundaries (skid buffers) between RX ↔ Parser, Parser ↔ Logic, Logic ↔ TX. Carries per-message timestamps so you can compute stage latencies.
+- **`hdl/tb_top.sv`** — Testbench top module.
 
 ### Simulation (Verilator)
 
-- **`sim/tb_top.sv`** — Top that wires the modules together.
-- **`sim/main.cpp`** — Verilator harness. Feeds bytes from messages/packets.bin, applies periodic backpressure to exercise ready/valid, logs events and latencies.
-- **`sim/run_sim.sh`** — Build & run the sim (obj_dir/sim_vlt), generate logs and vlt_dump.vcd.
+- **`tb/main.cpp`** — Verilator harness with UART decoding, timestamp capture, and backpressure.
 
 ### Bench / reference
 
@@ -53,14 +58,7 @@ Pipeline:
 
 ### Packet generation
 
-- **`tools/build_itch_from_gzpart.py`** — Reads a partial gzip (*.gz.part) of real Nasdaq ITCH, safely decompresses whatever is present, splits into ITCH messages, wraps each into a full Ethernet frame (preamble/SFD + header + payload + FCS), and writes:
-    - `messages/packets.bin` (raw frames, concatenated)
-    - `messages/sample.mem` (one hex byte per line for quick viewing)
-
-### Documents
-
-- **`docs/architecture.drawio`** — Block diagram (draw.io).
-- **`docs/design_notes.md`** — Design notes (architecture, state machines, latency method, tests).
+- **`bench/build_itch_from_gzpart.py`** - Converts real Nasdaq ITCH dumps into valid Ethernet frames.
 
 ---
 
@@ -70,12 +68,12 @@ Pipeline:
 
 ```bash
 # From repo root
-python tools/build_itch_from_gzpart.py --source itch_sample.gz.part
+python bench/build_itch_from_gzpart.py --source itch_sample.gz.part
 # Optional:
 #   --limit N     # cap number of ITCH messages (helps avoid multi-GB outputs)
 #   --skip K      # skip K ITCH messages first (e.g., to reach first 'P' trade)
 # Examples:
-python tools/build_itch_from_gzpart.py --source itch_sample.gz.part --skip 240000 --limit 100000
+python bench/build_itch_from_gzpart.py --source itch_sample.gz.part --skip 240000 --limit 100000
 ```
 
 This creates:
@@ -88,8 +86,7 @@ This creates:
 ## 2) Build and run the Verilator simulation
 
 ```bash
-cd sim
-../tools/run_sim.sh
+make run
 ```
 
 Outputs (in `sim/`):
@@ -128,15 +125,14 @@ End-to-end latency measured from the Verilator log (`sim/latencies.csv`):
 |-----------|----------|---------|------------|------------------|-----------------|-----------------|
 | 239381    | 239419   | 239419  | 239419     | 38               | 0               | **38**          |
 | 239453    | 239491   | 239491  | 239491     | 38               | 0               | **38**          |
-| 496061    | 496099   | 496099  | 496099     | 38               | 0               | **38**          |
-| 894111    | 894149   | 894149  | 894149     | 38               | 0               | **38**          |
-| 1512406   | 1512444  | 1512444 | 1512444    | 38               | 0               | **38**          |
 
-> With the design clocked at **250 MHz** (see Vivado timing below), **38 cycles ≈ 152 ns** end-to-end.
+**38 cycles at 250 MHz ≈ 152 ns**
 
 ---
 
-### Implementation (Vivado 2025.1)  (Out of Date)
+### Implementation (Vivado 2025.1)
+
+Note: Vivado reports are out-of-date and were last generated from a previous revision of the design.
 
 **Device:** `xc7a200tfbg676-2` • **Design state:** Routed
 
@@ -149,19 +145,6 @@ End-to-end latency measured from the Verilator log (`sim/latencies.csv`):
 - **WHS (hold): +0.152 ns**
 - **PW slack:** +1.500 ns
 
-**Resource utilization**
-
-| Resource         | Used | Available | Util% |
-|------------------|-----:|----------:|-----:|
-| Slice LUTs       | 220  | 134,600   | 0.16 |
-| Slice Registers  | 383  | 269,200   | 0.14 |
-| BRAM (RAMB18/36) | 0    | 730 / 365 | 0.00 |
-| DSPs             | 0    | 740       | 0.00 |
-| BUFG             | 1    | 32        | 3.13 |
-| Bonded IOB       | 12   | 400       | 3.00 |
-
-_Primitive breakdown (top few):_ FDCE=373, LUT6=79, LUT3=69, CARRY4=28, IBUF=11, OBUF=1, BUFG=1.
-
 ---
 
 ## Requirements
@@ -169,13 +152,6 @@ _Primitive breakdown (top few):_ FDCE=373, LUT6=79, LUT3=69, CARRY4=28, IBUF=11,
 - Verilator (build and run sim)
 - Python 3.9+
 - No network needed for .gz.part path.
-
-Install examples (Ubuntu):
-
-```bash
-sudo apt-get install verilator
-python -m venv .venv && source .venv/bin/activate
-```
 
 ---
 
@@ -239,65 +215,29 @@ When backpressure is active, you’ll see PARSED events continue (parser output 
 ```python
 .
 ├─ bench/
-│  ├─ analyse_latencies.py        # Analyse per-stage latencies
-│  ├─ compare_outputs.py          # Diff reference vs RTL logs
-│  └─ reference_parser.py         # Offline “golden” parser + CRC
 ├─ docs/
-│  ├─ architecture.drawio         # Block diagram (draw.io)
-│  └─ design_notes.md             # Architecture, FSMs, latency, tests
 ├─ hdl/
-│  ├─ fpga_top.sv                 # Top-level module for FPGA synthesis
-│  ├─ eth_rx.sv                   # Ethernet RX
-│  ├─ parser.sv                   # ITCH parser
-│  ├─ pipeline_regs.sv            # Stage boundary registers
-│  ├─ trading_logic.sv            # Simple trading rule
-│  └─ uart_tx.sv                  # UART transmitter
 ├─ messages/
-│  ├─ packets.bin                 # Generated Ethernet frames (binary)
-│  └─ sample.mem                  # Same bytes, one per line (hex)
 ├─ sim/
-│  ├─ backpressure_log.txt        # Backpressure stall markers
-│  ├─ crc_log.txt                 # CRC PASS/FAIL report
-│  ├─ decision_log.txt            # DECISION events
-│  ├─ latencies.csv               # Per-message stage timings
-│  ├─ main.cpp                    # Verilator harness
-│  ├─ output_capture.txt          # UART line state per clock
-│  ├─ parser_log.txt              # PARSED events
-│  ├─ payload_capture.txt         # Payload bytes captured
-│  ├─ reference_decisions.csv     # Expected DECISION events
-│  ├─ reference_parsed.csv        # Expected PARSED events
-│  ├─ tb_top.sv                   # Top-level SV testbench
-│  └─ vlt_dump.vcd                # Waveform dump (GTKWave)
-├─ tools/
-│  ├─ build_itch_from_gzpart.py   # .gz.part → packets.bin + sample.mem
-│  ├─ decode_uart.py              # Optional: UART log decoder
-│  └─ run_sim.sh                  # Build & run script
+├─ tb/
 ├─ vivado/
-│  ├─ messages.log                # Synthesis and Implementation log
-│  ├─ timing_summary.rpt          # Timing closure summary
-│  └─ utilization.rpt             # Resource usage
-├─ itch_sample.gz.part            # Sample ITCH input (truncated gzip)
+├─ itch_sample.gz.part
+├─ Makefile
 └─ README.md
 
 ```
 
 ---
 
-## Notes on formats
+## Notes and Limitations 
 
-Ethernet framing in `packets.bin` includes preamble (7×0x55), SFD (0xD5), header (DA/SA/EtherType), payload (ITCH message), and FCS (CRC-32).
-
-FCS is stored LSB-first (wire order). The receiver computes CRC with the reflected 802.3 polynomial (init 0xFFFFFFFF, xorout 0xFFFFFFFF), excludes the SFD, and compares.
-
----
-
-## Troubleshooting
-
-- **sample.mem is huge** — Add `--limit` when you build from a real ITCH dump.
-- **No ‘P’ trades near the start** — Use `--skip` to jump ahead (e.g., `--skip 240000`).
-- **CRC fails** — Make sure `packets.bin` wasn’t edited; the generator recomputes FCS per frame.
-
-- **No TX words for some PARSED lines** — The rule didn’t trigger (price >= THRESHOLD) or TX was back-pressured at that moment (it will transmit when ready returns).
+- Only basic ITCH message parsing and a single hardcoded trading rule are implemented.
+- No support for multiple symbols, users, or sessions.
+- Security, error handling, and compliance features are not included.
+- The design is not intended for production use, high throughput, or distributed operation.
+- UART output and simulation scripts are for demonstration only.
+- Hardware portability and scalability are not considered.
+- Documentation and testing are minimal and focused on illustrating core concepts.
 
 
 

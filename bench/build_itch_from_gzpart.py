@@ -2,11 +2,11 @@
 """
 Build Ethernet frames from a (possibly truncated) Nasdaq ITCH gzip part.
 
-In this repo we read: itch_sample.gz.part  →  writes:
+Usage example:
+itch_sample.gz.part  →  writes:
   - messages/packets.bin  (concatenated Ethernet frames incl. preamble+FCS)
   - messages/sample.mem   (same bytes, 1 hex byte per line)
 
-See README for options like --skip / --limit / custom MACs.
 """
 
 import os, sys, argparse, gzip, io
