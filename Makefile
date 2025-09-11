@@ -8,6 +8,7 @@ REPO_ROOT  := $(SCRIPT_DIR)
 TB_DIR     := $(REPO_ROOT)/tb
 HDL_DIR    := $(REPO_ROOT)/hdl
 SIM_DIR    := $(TB_DIR)
+SIM_OUT    := $(REPO_ROOT)/sim
 
 # Verilator sources
 HDL_SRCS := \
@@ -25,13 +26,14 @@ VLT_EXE := $(SIM_DIR)/obj_dir/sim_vlt
 # Default target: build and run
 .PHONY: run
 run: $(VLT_EXE)
+	@mkdir -p $(SIM_OUT)
 	@echo
-	@echo "Running simulation..."
-	@$(VLT_EXE)
+	@echo "Running simulation from $(TB_DIR)..."
+	@cd $(TB_DIR) && ./obj_dir/sim_vlt
 	@echo
 	@echo "✅ Simulation complete."
-	@echo "   • UART bits → output_capture.txt"
-	@echo "   • Waveforms → vlt_dump.vcd"
+	@echo "Artifacts in: $(SIM_OUT)"
+	@ls -1 $(SIM_OUT) | sed 's/^/  • /'
 
 # Build Verilator simulation
 $(VLT_EXE):
@@ -50,9 +52,14 @@ $(VLT_EXE):
 		$(HDL_SRCS) \
 		-o sim_vlt
 
-# Clean simulation outputs
 .PHONY: clean
 clean:
-	rm -rf $(SIM_DIR)/obj_dir
-	rm -f  $(SIM_DIR)/vlt_dump.vcd
-	rm -f  $(SIM_DIR)/output_capture.txt
+	rm -rf $(TB_DIR)/obj_dir
+	rm -f  $(SIM_OUT)/vlt_dump.vcd
+	rm -f  $(SIM_OUT)/output_capture.txt
+	rm -f  $(SIM_OUT)/payload_capture.txt
+	rm -f  $(SIM_OUT)/parser_log.txt
+	rm -f  $(SIM_OUT)/decision_log.txt
+	rm -f  $(SIM_OUT)/crc_log.txt
+	rm -f  $(SIM_OUT)/latencies.csv
+	rm -f  $(SIM_OUT)/backpressure_log.txt

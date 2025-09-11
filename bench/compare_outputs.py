@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-import csv, re, sys
+import csv
+import re
+import sys
+
 
 def load_ref(path):
     """
@@ -13,6 +16,7 @@ def load_ref(path):
             if row["msg_type"] == "P" and row.get("price") and row.get("volume"):
                 out.append((int(row["price"]), int(row["volume"])))
     return out
+
 
 def load_fpga(path):
     """
@@ -29,6 +33,7 @@ def load_fpga(path):
                 out.append((int(m.group(2)), int(m.group(3))))
     return out
 
+
 def main():
     # Load reference and FPGA parsed outputs
     ref = load_ref("sim/reference_parsed.csv")
@@ -44,12 +49,15 @@ def main():
 
     if mism:
         # Show first mismatch and exit with error
-        print(f"First mismatch at index {mism[0][0]}  REF={mism[0][1]}  FPGA={mism[0][2]}")
+        print(
+            f"First mismatch at index {mism[0][0]}  REF={mism[0][1]}  FPGA={mism[0][2]}"
+        )
         sys.exit(1)
     else:
         # All compared tuples match
         print("OK: All compared messages match.")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
